@@ -7,23 +7,10 @@ export class UserModel {
 	id: number
 
 	@Expose()
-	@ApiProperty({ type: String, nullable: true })
-	snsUid: string | null
+	@ApiProperty({ type: String, nullable: false })
+	account: string
 
 	@Expose()
-	@ApiProperty({ type: String, nullable: true })
-	nickName: string | null
-
-	@Expose()
-	@ApiProperty({ type: String, nullable: true })
-	phone: string | null
-
-	@Expose()
-	@ApiProperty({ type: String, nullable: true })
-	email: string | null
-
-	@Expose()
-	@ApiProperty({ type: String, nullable: true })
-	role: string | null
-
+	@ApiProperty({ type: String, nullable: false })
+	email: string
 }

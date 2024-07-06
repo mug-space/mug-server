@@ -6,6 +6,7 @@ import TypeOrmConfig from './orm.config'
 import { TypeOrmExModule } from './type_orm_ex.module'
 import { addTransactionalDataSource } from 'typeorm-transactional'
 import { DataSource } from 'typeorm'
+import { UserRepository } from 'src/api/repositories/user.repository'
 
 @Module({
 	imports: [
@@ -19,6 +20,7 @@ import { DataSource } from 'typeorm'
 			},
 		}),
 		TypeOrmExModule.forCustomRepository([
+			UserRepository,
 
 		]),
 	],

@@ -2,9 +2,6 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	JoinColumn,
-	OneToMany,
-	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
@@ -17,19 +14,10 @@ export class UserEntity {
 	id: number
 
 	@Column('varchar', {
-		name: 'sns_uid',
 		nullable: false,
-		comment: 'SNS 플랫폼 제공 Unique ID',
+		comment: '로그인 계정명',
 	})
-	snsUid: string
-
-	@Column('varchar', {
-		name: 'nick_name',
-		nullable: false,
-		comment: '닉네임',
-		length: 30,
-	})
-	nickName: string
+	account: string
 
 	@Column('varchar', {
 		name: 'email',
@@ -40,20 +28,16 @@ export class UserEntity {
 	email: string
 
 	@Column('varchar', {
-		name: 'phone',
 		nullable: false,
-		comment: '전화번호',
-		length: 20,
+		comment: '비밀번호',
+		length: 256,
 	})
-	phone: string
+	password: string
 
-	@Column('varchar', {
-		name: 'role',
-		nullable: false,
-		comment: '전화번호',
-		length: 20,
-		default: 'user',
-	})
-	role: string
+	@CreateDateColumn()
+	createdAt: Date
+
+	@UpdateDateColumn()
+	updatedAt: Date
 
 }
