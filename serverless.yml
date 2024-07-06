@@ -1,0 +1,49 @@
+service: mug-space-server
+
+provider:
+  name: aws
+  architecture: arm64
+  runtime: nodejs20.x
+  region: ap-northeast-2
+  stage: ${opt:stage, 'dev'}
+  deploymentBucket:
+    name: mug-space-server-lambda-${opt:stage, 'dev'}
+  ecr:
+    images:
+      latest:
+        path: ./
+        # platform: linux/amd64  ## x86으로 도커이미지 빌드
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - "secretsmanager:GetSecretValue"
+          Resource: "*"
+        - Effect: "Allow"
+          Action:
+            - "s3:ListBucket"
+            - "s3:PutObject"
+            - "s3:GetObject"
+            - "s3:DeleteObject"
+          Resource: "*"
+
+  #
+  # 바이너리 서비스를 위해 api gateway 설정 추가
+  #
+  httpApi:
+    cors: true
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
+functions:
+  api:
+    architecture: arm64 ## arm64 플랫폼으로 서비스
+    # url: true
+    image:
+      name: latest
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+

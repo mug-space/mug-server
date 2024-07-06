@@ -1,0 +1,11 @@
+{
+	"collection": "@nestjs/schematics",
+	"sourceRoot": "src",
+	"language": "ts",
+	"projects": {
+		"export-swagger-spec": {
+			"type": "application",
+			"entryFile": "ExportSwaggerSpec"
+		}
+	}
+}
