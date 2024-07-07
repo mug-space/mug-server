@@ -43,7 +43,5 @@ jobs:
 
       - name: Install Node Modules
         run: yarn install --production=false
-      - name: Build
-        run: yarn build
       - name: Deploy Serverless
         run: npx sls deploy --stage prod
