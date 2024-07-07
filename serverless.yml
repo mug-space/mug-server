@@ -38,7 +38,6 @@ provider:
     images:
       latest:
         path: ./
-        # platform: linux/amd64  ## x86으로 도커이미지 빌드
   iam:
     role:
       statements:
@@ -53,47 +52,19 @@ provider:
             - "s3:GetObject"
             - "s3:DeleteObject"
           Resource: "*"
-
-  #
-  # 바이너리 서비스를 위해 api gateway 설정 추가
-  #
-
-
-  httpApi:
-    cors: true
-    payload: '2.0'
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
 
 functions:
   api:
-    # architecture: arm64 ## arm64 플랫폼으로 서비스
-    # url: true
     image:
       name: latest
     events:
-      - httpApi:
+      - http:
+          path: /
+          method: ANY
+      - http:
           path: /{proxy+}
           method: ANY
 
-resources:
-  Resources:
-    ApiGatewayDeployment:
-      Type: 'AWS::ApiGateway::Deployment'
-      Properties:
-        RestApiId:
-          Ref: 'ApiGatewayRestApi'
-      DependsOn: ApiGatewayRestApi
-
-    ApiGatewayStage:
-      Type: 'AWS::ApiGateway::Stage'
-      Properties:
-        StageName: ${opt:stage, self:provider.stage}
-        RestApiId:
-          Ref: 'ApiGatewayRestApi'
-        DeploymentId:
-          Ref: 'ApiGatewayDeployment'
-      DependsOn: ApiGatewayDeployment
-
-    ApiGatewayRestApi:
-      Type: 'AWS::ApiGateway::RestApi'
-      Properties:
-        Name: ${self:service}-${opt:stage, self:provider.stage}
