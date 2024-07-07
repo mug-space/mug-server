@@ -6,14 +6,14 @@
 	"license": "UNLICENSED",
 	"scripts": {
 		"build": "yarn clean && nest build",
-		"start": "AWS_PROFILE=mugspace nest start --watch",
+		"start": "NODE_ENV=production AWS_PROFILE=mugspace nest start --watch",
 		"dev": "AWS_PROFILE=mugspace nest start --debug --watch",
 		"clean": "rimraf dist",
 		"deploy": "sls deploy --aws-profile mugspace --stage prod",
 		"typeorm": "typeorm-ts-node-commonjs",
-		"migration:generate": "AWS_PROFILE=mugspace yarn run typeorm migration:generate src/migrations/migrations --dataSource src/ormconfig.ts",
-		"migration:run": "AWS_PROFILE=mugspace yarn run typeorm migration:run -d src/ormconfig.ts",
-		"migration:revert": "AWS_PROFILE=mugspace yarn run typeorm migration:revert -d src/ormconfig.ts"
+		"migration:generate": "NODE_ENV=production AWS_PROFILE=mugspace yarn run typeorm migration:generate src/migrations/migrations --dataSource src/ormconfig.ts",
+		"migration:run": "NODE_ENV=production AWS_PROFILE=mugspace yarn run typeorm migration:run -d src/ormconfig.ts",
+		"migration:revert": "NODE_ENV=production AWS_PROFILE=mugspace yarn run typeorm migration:revert -d src/ormconfig.ts"
 	},
 	"dependencies": {
 		"@aws-sdk/client-s3": "3.511.0",

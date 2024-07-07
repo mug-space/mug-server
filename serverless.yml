@@ -10,7 +10,7 @@ package:
 
 provider:
   name: aws
-  architecture: arm64
+  # architecture: arm64
   runtime: nodejs20.x
   memorySize: 512
   timeout: 900
@@ -50,7 +50,7 @@ provider:
       - '*/*'
 functions:
   api:
-    architecture: arm64 ## arm64 플랫폼으로 서비스
+    # architecture: arm64 ## arm64 플랫폼으로 서비스
     # url: true
     image:
       name: latest

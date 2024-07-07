@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM --platform=linux/arm64 node:20-alpine AS builder
+FROM node:20-alpine AS builder
 
 
 # Set the working directory
@@ -18,7 +18,7 @@ COPY . .
 RUN yarn build
 
 # Stage 2: Create the final image
-FROM --platform=linux/arm64 public.ecr.aws/lambda/nodejs:20-arm64
+FROM public.ecr.aws/lambda/nodejs:20-arm64
 
 # Set the working directory
 WORKDIR /var/task
