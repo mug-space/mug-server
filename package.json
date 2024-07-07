@@ -4,7 +4,6 @@
 	"description": "Mug Space Server",
 	"private": true,
 	"license": "UNLICENSED",
-	"packageManager": "yarn@4.2.2",
 	"scripts": {
 		"build": "yarn clean && nest build",
 		"start": "AWS_PROFILE=mugspace nest start --watch",
