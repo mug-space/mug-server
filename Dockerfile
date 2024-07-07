@@ -3,7 +3,6 @@ WORKDIR /app
 COPY . .
 RUN apk add --no-cache vips-dev
 RUN apk add --no-cache fftw-dev build-base --repository https://alpine.global.ssl.fastly.net/alpine/edge/community/
-RUN yarn add sharp
 
 RUN yarn build
 
