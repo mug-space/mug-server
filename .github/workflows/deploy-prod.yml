@@ -42,12 +42,8 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Install Node Modules
-        run: yarn install --production=false
+        run: yarn
       - name: Build
         run: yarn build
-
-      - name: ReInstall
-        run: rm -rf node_modules && yarn install --production=true
-
       - name: Deploy Serverless
         run: yarn deploy

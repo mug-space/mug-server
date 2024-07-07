@@ -1,13 +1,25 @@
 service: mug-space-server
 
+package:
+  patterns:
+    - '!.git/**'
+    - '!src/**'
+    - '!node_modules/@types/**'
+    - '!node_modules/serverless/**'
+    - '!node_modules/serverless-*/**'
+
 provider:
   name: aws
   architecture: arm64
   runtime: nodejs20.x
+  memorySize: 512
+  timeout: 900
+  environment:
+    STAGE: ${opt:stage, 'prod'}
   region: ap-northeast-2
   stage: ${opt:stage, 'dev'}
   deploymentBucket:
-    name: mug-space-server-lambda-${opt:stage, 'dev'}
+    name: mug-space-server-lambda-${opt:stage, 'prod'}
   ecr:
     images:
       latest:
