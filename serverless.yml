@@ -31,7 +31,7 @@ provider:
   environment:
     STAGE: ${opt:stage, 'prod'}
   region: ap-northeast-2
-  stage: ${opt:stage, 'dev'}
+  stage: ${opt:stage, 'prod'}
   deploymentBucket:
     name: mug-space-server-lambda-${opt:stage, 'prod'}
   ecr:
@@ -57,6 +57,8 @@ provider:
   #
   # 바이너리 서비스를 위해 api gateway 설정 추가
   #
+
+
   httpApi:
     cors: true
     payload: '2.0'
@@ -74,21 +76,24 @@ functions:
 
 resources:
   Resources:
-    ApiGatewayRestApi:
-      Type: 'AWS::ApiGateway::RestApi'
-      Properties:
-        Name: ${self:service}-${opt:stage, self:provider.stage}
-    ApiGatewayStage:
-      Type: 'AWS::ApiGateway::Stage'
-      Properties:
-        RestApiId:
-          Ref: ApiGatewayRestApi
-        StageName: ${opt:stage, self:provider.stage}
     ApiGatewayDeployment:
       Type: 'AWS::ApiGateway::Deployment'
       Properties:
         RestApiId:
-          Ref: ApiGatewayRestApi
+          Ref: 'ApiGatewayRestApi'
+      DependsOn: ApiGatewayRestApi
+
+    ApiGatewayStage:
+      Type: 'AWS::ApiGateway::Stage'
+      Properties:
         StageName: ${opt:stage, self:provider.stage}
-      DependsOn:
-        - ApiGatewayStage
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'
+        DeploymentId:
+          Ref: 'ApiGatewayDeployment'
+      DependsOn: ApiGatewayDeployment
+
+    ApiGatewayRestApi:
+      Type: 'AWS::ApiGateway::RestApi'
+      Properties:
+        Name: ${self:service}-${opt:stage, self:provider.stage}
