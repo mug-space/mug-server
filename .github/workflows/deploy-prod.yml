@@ -46,4 +46,4 @@ jobs:
       - name: Build
         run: yarn build
       - name: Deploy Serverless
-        run: yarn deploy
+        run: sls deploy --stage prod

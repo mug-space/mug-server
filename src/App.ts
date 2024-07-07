@@ -36,7 +36,6 @@ export const initApp = async () => {
 	app.use(cors(corsOptions))
 	const nestapp = await NestFactory.create(AppModule, new ExpressAdapter(app))
 	nestapp.enableShutdownHooks()
-	nestapp.setGlobalPrefix('api')
 	nestapp.enableCors(corsOptions)
 	nestapp.use(compression())
 	nestapp.use(cookieParser())
