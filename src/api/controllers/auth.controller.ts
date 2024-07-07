@@ -23,8 +23,14 @@ export class AuthController {
 		if (!user) {
 			throw new UnauthorizedException('가입되어있지않은 계정입니다.')
 		}
-		const token = await this.userService.comparePassword()
-		return
+		const isMatch = await this.userService.comparePassword(user.id, body.password)
+		if (!isMatch) {
+			throw new UnauthorizedException('비밀번호가 일치하지않습니다.')
+		}
+		const token = await this.userService.makeToken(user)
+		return PostAuthSignInResponse.builder()
+			.token(token)
+			.build()
 	}
 
 	@Post('signup')

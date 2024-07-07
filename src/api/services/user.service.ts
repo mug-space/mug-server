@@ -53,9 +53,15 @@ export class UserService {
 		return hash
 	}
 
-	async comparePassword(hash: string, password: string) {
-		const isMatch = await bcrypt.compare(password, hash)
-		return isMatch
+	async comparePassword(userId: number, password: string) {
+		const user = await this.userRepository.findOne({ where: {
+			id: userId,
+		} })
+		if (user) {
+			const isMatch = await bcrypt.compare(password, user.password)
+			return isMatch
+		}
+		return false
 	}
 
 }
