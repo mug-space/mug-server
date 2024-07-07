@@ -59,9 +59,8 @@ provider:
   #
   httpApi:
     cors: true
-  apiGateway:
-    binaryMediaTypes:
-      - '*/*'
+    payload: '2.0'
+
 functions:
   api:
     # architecture: arm64 ## arm64 플랫폼으로 서비스
@@ -73,3 +72,23 @@ functions:
           path: /{proxy+}
           method: ANY
 
+resources:
+  Resources:
+    ApiGatewayRestApi:
+      Type: 'AWS::ApiGateway::RestApi'
+      Properties:
+        Name: ${self:service}-${opt:stage, self:provider.stage}
+    ApiGatewayStage:
+      Type: 'AWS::ApiGateway::Stage'
+      Properties:
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        StageName: ${opt:stage, self:provider.stage}
+    ApiGatewayDeployment:
+      Type: 'AWS::ApiGateway::Deployment'
+      Properties:
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        StageName: ${opt:stage, self:provider.stage}
+      DependsOn:
+        - ApiGatewayStage
