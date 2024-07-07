@@ -1,16 +1,15 @@
 import { Module } from '@nestjs/common'
-import { JwtModule, JwtService } from '@nestjs/jwt'
+import { JwtModule } from '@nestjs/jwt'
 
 @Module({
 	imports: [ JwtModule.register({
+		global: true,
 		secret: 'mugspace',
-		secretOrPrivateKey: 'mugspace',
 		signOptions: {
 		  expiresIn: '60m',
 		},
 	  }) ],
-	providers: [ JwtService ],
-	exports: [ JwtModule, JwtService ],
+	exports: [ JwtModule ],
 
 })
 export class AuthModule { }

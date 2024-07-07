@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { plainToInstance } from 'class-transformer'
+import { instanceToPlain, plainToInstance } from 'class-transformer'
 import { UserModel } from '../dtos/models/user.model'
 import { UserRepository } from '../repositories/user.repository'
 import * as bcrypt from 'bcrypt'
@@ -44,7 +44,7 @@ export class UserService {
 	}
 
 	async makeToken(user: UserModel) {
-		return await this.jwtService.signAsync(user)
+		return await this.jwtService.signAsync(instanceToPlain(user))
 	}
 
 	private async makePassword(password: string) {

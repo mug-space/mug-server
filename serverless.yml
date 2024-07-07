@@ -1,5 +1,19 @@
 service: mug-space-server
 
+plugins:
+  - serverless-domain-manager
+
+custom:
+  customDomain:
+    domainName: api.mug-space.io
+    basePath: ''
+    certificateName: '*.mug-space.io'
+    stage: ${opt:stage, 'prod'}
+    createRoute53Record: true
+    endPointType: 'regional'
+    securityPolicy: tls_1_2
+
+
 package:
   patterns:
     - '!.git/**'
