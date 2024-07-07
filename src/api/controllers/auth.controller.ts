@@ -19,7 +19,10 @@ export class AuthController {
 	@ApiOperation({ summary: '로그인' })
 	@CommonResponse({ type: PostAuthSignInResponse })
 	async postSignIn(@Body() body: PostAuthSignInRequest) {
-		console.info(body)
+		const user = await this.userService.getUserByAccount(body.account)
+		if (!user) {
+			throw new UnauthorizedException('가입되어있지않은 계정입니다')
+		}
 		return
 	}
 
@@ -27,8 +30,11 @@ export class AuthController {
 	@ApiOperation({ summary: '회원가입' })
 	@CommonResponse({ type: PostAuthSignUpResponse })
 	async postSignUp(@Body() body: PostAuthSignUpRequest) {
-		console.info(body)
-		return
+		const user = await this.userService.createUser(body.account, body.email, body.password)
+		const toekn = await this.userService.makeToken(user)
+		return PostAuthSignUpResponse.builder()
+			.token(toekn)
+			.build()
 	}
 
 }
