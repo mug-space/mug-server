@@ -1,13 +1,8 @@
-import { Body, Controller, Get, Inject, NotFoundException, Post, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Inject, NotFoundException, Post, UnauthorizedException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
-import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
-import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
-import {
-	GetUserMeResponse,
-} from '../dtos/user.dto'
-import { UserEntity } from '../entities/user.entity'
+import { PostAuthSignInRequest, PostAuthSignInResponse, PostAuthSignUpRequest, PostAuthSignUpResponse } from '../dtos/auth.dto'
 import { UserService } from '../services/user.service'
 
 @Controller('auths')
@@ -22,16 +17,18 @@ export class AuthController {
 
 	@Post('signin')
 	@ApiOperation({ summary: '로그인' })
-	@CommonResponse({ type: GetUserMeResponse })
-	async postSignIn(@Body() body: {}) {
-
+	@CommonResponse({ type: PostAuthSignInResponse })
+	async postSignIn(@Body() body: PostAuthSignInRequest) {
+		console.info(body)
+		return
 	}
 
 	@Post('signup')
 	@ApiOperation({ summary: '회원가입' })
-	@CommonResponse({ type: GetUserMeResponse })
-	async postSignUp(@Body() body: {}) {
-
+	@CommonResponse({ type: PostAuthSignUpResponse })
+	async postSignUp(@Body() body: PostAuthSignUpRequest) {
+		console.info(body)
+		return
 	}
 
 }
