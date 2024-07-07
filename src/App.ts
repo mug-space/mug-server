@@ -45,7 +45,7 @@ export const initApp = async () => {
 		disableErrorMessages: process.env.NODE_ENV === 'production',
 	}))
 	const swaggerDocument = initSwagger(nestapp)
-	SwaggerModule.setup('/swagger', nestapp, swaggerDocument)
+	SwaggerModule.setup('/api', nestapp, swaggerDocument)
 	initDayjs()
 	await nestapp.init()
 	return app
