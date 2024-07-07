@@ -25,12 +25,12 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/yarn.lock* ./
 COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.1 /lambda-adapter /opt/extensions/lambda-adapter
 ENV NODE_ENV production
-# CMD ["dist/lambda.handler"]
+CMD ["dist/lambda.handler"]
 
-EXPOSE 8000
+# EXPOSE 8000
 
-ENV PORT 8000
-ENV HOST=0.0.0.0 PORT=8000 NODE_ENV=production
+# ENV PORT 8000
+# ENV HOST=0.0.0.0 PORT=8000 NODE_ENV=production
 
-CMD ["node", "dist/main.js"]
+# CMD ["node", "dist/main.js"]
 
