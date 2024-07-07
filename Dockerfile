@@ -1,11 +1,12 @@
-FROM public.ecr.aws/lambda/nodejs:20
-
-COPY . ./
-
+FROM public.ecr.aws/lambda/nodejs:20-arm64
+WORKDIR ${LAMBDA_TASK_ROOT}
+COPY . .
+RUN npm install -g yarn
 RUN yarn
-RUN yarn build
 ENV NODE_ENV production
+RUN yarn build
 CMD ["dist/lambda.handler"]
+
 
 # FROM node:20-alpine AS builder
 # WORKDIR /app
