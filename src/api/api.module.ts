@@ -5,15 +5,14 @@ import { CommonModule } from '../common/common.module'
 import { AppController } from './controllers/app.controller'
 import { UserController } from './controllers/user.controller'
 import { UserService } from './services/user.service'
-import { JwtService } from '@nestjs/jwt'
+import { AuthController } from './controllers/auth.controller'
 
-const controllers = [ AppController, UserController ]
+const controllers = [ AppController, AuthController, UserController ]
 @Module({
 	imports: [ CommonModule ],
 	controllers: [ ...controllers ],
 	providers: [
 		UserService, JwtStrategy,
-		JwtService,
 	],
 	exports: [],
 })
