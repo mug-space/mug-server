@@ -12,7 +12,7 @@ export class SecretManager {
 			const secret = data.SecretString
 			if (secret) {
 				const parseSecret = JSON.parse(secret)
-				console.log(parseSecret)
+				console.info(parseSecret)
 				return {
 					...parseSecret,
 					NODE_ENV: process.env.NODE_ENV || 'development',

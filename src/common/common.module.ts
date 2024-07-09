@@ -2,8 +2,8 @@ import { HttpModule } from '@nestjs/axios'
 import { Module, ValidationPipe } from '@nestjs/common'
 import { APP_PIPE } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module'
-import { CommonConfigModule } from './config/common_config.module'
-import { TypeOrmConfigModule } from './db/orm_config.module'
+import { CommonConfigModule } from './config/common-config.module'
+import { TypeOrmConfigModule } from './db/orm-config.module'
 import { ResponseModule } from './response/response.module'
 
 @Module({

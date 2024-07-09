@@ -6,7 +6,7 @@ import {
 	ApiResponse,
 	ApiResponseMetadata,
 } from '@nestjs/swagger'
-import { BaseResponse } from './base_response.model'
+import { BaseResponse } from './base-response.model'
 
 export const wrapCommonMetadataKey = 'wrapCommonMetadataKey'
 

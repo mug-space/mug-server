@@ -27,7 +27,7 @@ export class AuthMiddleware implements NestMiddleware {
 					delete verify.exp
 					const jwt = await this.jwtService.signAsync(verify, { secret: 'mugspace', expiresIn: '60m' })
 					res.cookie('auth', { token: jwt }, {
-						maxAge: 1000 * 60 * 60, // 10min
+						maxAge: 1000 * 60 * 60, // 60min
 						httpOnly: true,
 						secure: true,
 						sameSite: 'none',

@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common'
-import { ErrorResponse } from '../response/base_response.model'
+import { ErrorResponse } from '../response/base-response.model'
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

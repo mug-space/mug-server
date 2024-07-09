@@ -13,4 +13,8 @@ export class UserModel {
 	@Expose()
 	@ApiProperty({ type: String, nullable: false })
 	email: string
+
+	@Expose()
+	@ApiProperty({ type: Number, nullable: false })
+	point: number
 }

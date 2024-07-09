@@ -1,4 +1,4 @@
-import { SecretManager } from '../utils/secret_manager'
+import { SecretManager } from '../utils/secret-manager'
 
 export default async () => {
 	let env

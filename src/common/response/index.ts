@@ -1,2 +1,2 @@
-export * from './base_response.model'
-export * from './common_response.decorator'
+export * from './base-response.model'
+export * from './common-response.decorator'

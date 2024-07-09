@@ -37,4 +37,8 @@ export class UserController {
 			.build()
 	}
 
+	// TODO: PASSWORD 변경
+
+	// TODO: EMAIL 변경
+
 }

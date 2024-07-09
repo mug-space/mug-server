@@ -1,6 +1,7 @@
 import {
 	Column,
 	CreateDateColumn,
+	DeleteDateColumn,
 	Entity,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
@@ -34,10 +35,20 @@ export class UserEntity {
 	})
 	password: string
 
+	@Column('int', {
+		nullable: false,
+		comment: '잔여 point',
+		default: 0,
+	})
+	point: number
+
 	@CreateDateColumn()
 	createdAt: Date
 
 	@UpdateDateColumn()
 	updatedAt: Date
+
+	@DeleteDateColumn()
+	deletedAt: Date | null
 
 }
