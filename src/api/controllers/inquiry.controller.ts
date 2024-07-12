@@ -10,9 +10,18 @@ import { CommonResponse } from 'src/common/response'
 export class InquiryController {
 
 	// TODO: 문의 등록
+	async addInquiry() {
+
+	}
 
 	// TODO: 내 문의 목록
+	async getInquiryList() {
+
+	}
 
 	// TODO: 문의 상세
+	async getInquiryDetail() {
+
+	}
 
 }

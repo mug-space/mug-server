@@ -10,11 +10,18 @@ import { CommonResponse } from 'src/common/response'
 export class BillingController {
 
 	// TODO: 결제 목록
+	async getBillingList() {
 
-	// TODO: 결제 금액 Init
+	}
 
-	// TODO: 결제 Callback
+	// TODO: 결제, 취소 Callback 처리
+	async callbackBilling() {
+
+	}
 
 	// TODO: 결제 취소 요청
+	async requestBliingCancel() {
+
+	}
 
 }

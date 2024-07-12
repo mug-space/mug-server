@@ -9,6 +9,9 @@ import { CommonResponse } from 'src/common/response'
 @ApiTags('Point')
 export class PointController {
 
-	// TODO: 포인트 사용 목록
+	// TODO: 포인트 사용, 충전 목록
+	async getPointList() {
+
+	}
 
 }

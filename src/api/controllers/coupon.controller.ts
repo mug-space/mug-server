@@ -10,5 +10,8 @@ import { CommonResponse } from 'src/common/response'
 export class CouponController {
 
 	// TODO: coupon 처리
+	async applyCoupon() {
+
+	}
 
 }

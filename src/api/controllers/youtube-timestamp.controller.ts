@@ -5,14 +5,23 @@ import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
 
-@Controller('youtubes')
-@ApiTags('Youtube')
-export class YoutubeController {
+@Controller('youtube-timestamps')
+@ApiTags('YoutubeTimestamp')
+export class YoutubeTimestampController {
 
-	// TODO: youtube 처리 목록
+	// TODO: youtube timestamp 처리 목록
+	async getYoutubeTimestampList() {
+
+	}
 
 	// TODO: youtube timestamp 생성
+	async generateYoutubeTimestamp() {
 
-	// TODO: youtube 처리 상세 정보
+	}
+
+	// TODO: youtube 처리 결과 상세 정보
+	async getYoutubeTimestampDetail() {
+
+	}
 
 }

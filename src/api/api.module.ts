@@ -10,10 +10,10 @@ import { BillingController } from './controllers/billing.controller'
 import { CouponController } from './controllers/coupon.controller'
 import { InquiryController } from './controllers/inquiry.controller'
 import { PointController } from './controllers/point.controller'
-import { YoutubeController } from './controllers/youtube.controller'
+import { YoutubeTimestampController } from './controllers/youtube-timestamp.controller'
 
 const controllers = [ AppController, AuthController, UserController, BillingController, CouponController,
-	InquiryController, PointController, YoutubeController,
+	InquiryController, PointController, YoutubeTimestampController,
 ]
 @Module({
 	imports: [ CommonModule ],

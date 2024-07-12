@@ -11,8 +11,8 @@ class TimeStampModel {
 	title: string
 }
 
-@Entity('timestampLogs')
-export class TimestampLogEntity {
+@Entity('youtubeTimestamps')
+export class YoutubeTimestampEntity {
 	@PrimaryGeneratedColumn({
 		type: 'int',
 	})

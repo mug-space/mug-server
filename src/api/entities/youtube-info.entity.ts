@@ -21,7 +21,7 @@ export class YoutubeInfoEntity {
 
 	@Column('text', {
 		nullable: false,
-		comment: '자막들',
+		comment: '전체 자막',
 	})
 	caption: string
 
