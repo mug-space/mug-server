@@ -14,11 +14,18 @@ export enum BillingStatus {
 	CANCELLED = 'cancelled',
 }
 
-export enum BillingPayMethod {
+export enum BillingMethod {
 	CARD = 'card',
 	VBANK = 'vbank',
 	NAVER = 'naverpay',
 	KAKAO = 'kakaopay',
+}
+
+export enum BillingType {
+	NORMAL = 'NORMAL',
+	BILLING = 'BILLING',
+	BRANDPAY = 'BRANDPAY',
+
 }
 
 export enum BillingVBankName {
@@ -73,20 +80,38 @@ export class BillingEntity {
 		nullable: false,
 		comment: '결제 고유번호',
 	})
-	impUid: string
+	paymentKey: string
+
+	@Column('varchar', {
+		nullable: false,
+		comment: '결제 타입',
+	})
+	type: string
 
 	@Column('varchar', {
 		nullable: false,
 		comment: '주문번호',
 	})
-	merchantUid: string
+	orderId: string
+
+	@Column('varchar', {
+		nullable: false,
+		comment: '구매상품',
+	})
+	orderName: string
+
+	@Column('varchar', {
+		nullable: false,
+		comment: '상점ID',
+	})
+	mId: string
 
 	@Column('varchar', {
 		nullable: false,
 		comment: '결제방법',
 		length: 16,
 	})
-	payMethod: BillingPayMethod
+	method: BillingMethod
 
 	@Column('int', {
 		nullable: false,
@@ -98,7 +123,7 @@ export class BillingEntity {
 		nullable: false,
 		comment: '결제 금액',
 	})
-	amount: number
+	totalAmount: number
 
 	@Column('json', {
 		nullable: true,
