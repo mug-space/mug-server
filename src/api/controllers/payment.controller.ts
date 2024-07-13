@@ -5,22 +5,17 @@ import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
 
-@Controller('billings')
+@Controller('payments')
 @ApiTags('Billing')
-export class BillingController {
+export class PaymentController {
 
 	// TODO: 결제 목록
-	async getBillingList() {
+	async getPaymentList() {
 
 	}
 
-	// TODO: 결제, 취소 Callback 처리
-	async callbackBilling() {
-
-	}
-
-	// TODO: 결제 취소 요청
-	async requestBliingCancel() {
+	// TODO: 결제 승인
+	async confirmPayment() {
 
 	}
 

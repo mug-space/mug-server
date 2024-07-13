@@ -14,6 +14,12 @@ export class UserEntity {
 	})
 	id: number
 
+	@Column('uuid', {
+		nullable: false,
+		comment: 'user uuid',
+	})
+	uuid: string
+
 	@Column('varchar', {
 		nullable: false,
 		comment: '로그인 계정명',

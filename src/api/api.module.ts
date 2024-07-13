@@ -6,13 +6,13 @@ import { AppController } from './controllers/app.controller'
 import { UserController } from './controllers/user.controller'
 import { UserService } from './services/user.service'
 import { AuthController } from './controllers/auth.controller'
-import { BillingController } from './controllers/billing.controller'
+import { PaymentController } from './controllers/payment.controller'
 import { CouponController } from './controllers/coupon.controller'
 import { InquiryController } from './controllers/inquiry.controller'
 import { PointController } from './controllers/point.controller'
 import { YoutubeTimestampController } from './controllers/youtube-timestamp.controller'
 
-const controllers = [ AppController, AuthController, UserController, BillingController, CouponController,
+const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
 	InquiryController, PointController, YoutubeTimestampController,
 ]
 @Module({
