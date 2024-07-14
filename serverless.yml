@@ -63,7 +63,7 @@ provider:
 
 functions:
   api:
-    handler: dist/main.handler
+    # handler: dist/main.handler
     # package:
     #   patterns:
     #     - '!.git/**'
