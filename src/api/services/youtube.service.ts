@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { YoutubeRepository } from '../repositories/youtube.repository'
 import { YoutubeInfoRepository } from '../repositories/youtube-info.repository'
@@ -6,6 +6,8 @@ import { YoutubeTimestampRepository } from '../repositories/youtube-timestamp.re
 import { YoutubeTranscript } from 'youtube-transcript'
 import { instanceToInstance, plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
+import { HttpService } from '@nestjs/axios'
+import AWS from 'aws-sdk'
 
 @Injectable()
 export class YoutubeService {
@@ -16,25 +18,48 @@ export class YoutubeService {
 	private readonly youtubeInfoRepository: YoutubeInfoRepository
 	@InjectRepository(YoutubeTimestampRepository)
 	private readonly youtubeTimestampRepository: YoutubeTimestampRepository
+	@Inject()
+	private readonly httpService: HttpService
 
-	async checkUsableYoutube(url: string) {
-		const videoId = this.getVideoIdFromUrl(url)
-		const captions = await this.getCaption(videoId)
-		if (captions) {
-
+	async checkUsableYoutube(url: string, userId: number) {
+		const response = await this.httpService.get(url).toPromise()
+		if (response && response.status === 200) {
+			const videoId = this.getVideoIdFromUrl(url)
+			if (videoId) {
+				const captions = await this.getCaption(videoId)
+				if (captions && captions.length) {
+					const youtubeId = await this.addYoutube(videoId, userId)
+					await this.addYoutubeInfo(youtubeId, captions)
+					return youtubeId
+				}
+			}
 		}
+		return null
 	}
 
-	async addYoutubeInfo() {
+	async addYoutubeInfo(youtubeId: number, captions: Caption[]) {
+		const youtubeInfo = await this.youtubeInfoRepository.findOne({ where: { youtubeId } })
+		if (!youtubeInfo) {
+			const newYoutubeInfo = this.youtubeInfoRepository.create({ youtubeId: youtubeId, captions: captions })
+			await this.youtubeInfoRepository.save(newYoutubeInfo)
+		}
 
 	}
 
 	async addYoutube(videoId: string, userId: number) {
-
+		const youtube = await this.youtubeRepository.findOne({ where: { videoId, userId } })
+		if (!youtube) {
+			const newYoutube = this.youtubeRepository.create({ videoId, userId })
+			await this.youtubeRepository.save(newYoutube)
+			return newYoutube.id
+		}
+		return youtube.id
 	}
 
-	async addYoutubeTimestamp() {
-
+	async addYoutubeTimestamp(youtubeId: number) {
+		const youtubeTimestamp = this.youtubeTimestampRepository.create({ youtubeId })
+		await this.youtubeTimestampRepository.save(youtubeTimestamp)
+		return youtubeTimestamp.id
 	}
 
 	getVideoIdFromUrl(url: string) {
@@ -58,7 +83,7 @@ export class YoutubeService {
 			return match[2]
 		}
 
-		return url
+		return null
 	}
 
 	async getCaption(videoId: string) {
@@ -70,5 +95,17 @@ export class YoutubeService {
 			return null
 		}
 
+	}
+
+	async invodeYoutubeTimestampLambda(youtubeId: number, youtubeTimestampId: number) {
+		const lambda = new AWS.Lambda({
+			region: 'ap-northeast-2',
+		  })
+		  const data = {
+			youtubeTimestampId, youtubeId,
+		  }
+		  await lambda.invokeAsync({ FunctionName: 'mug-lambda-prod-main',
+			InvokeArgs: JSON.stringify({ target: 'youtube-timestamp',
+				data: data }) }).promise()
 	}
 }

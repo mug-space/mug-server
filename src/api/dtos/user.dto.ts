@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Builder } from 'builder-pattern'
-import { IsEmail } from 'class-validator'
+import { IsDefined, IsEmail } from 'class-validator'
 import { UserModel } from './models/user.model'
 
 export class GetUserMeResponse {
@@ -11,21 +11,26 @@ export class GetUserMeResponse {
 }
 
 export class PostUserSignUpRequest {
-	@ApiProperty({ type: String, nullable: true })
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
 	account: string
 
-	@ApiProperty({ type: String, nullable: true })
+	@ApiProperty({ type: String, nullable: false })
 	@IsEmail()
+	@IsDefined()
 	email: string
 
-	@ApiProperty({ type: String, nullable: true })
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
 	password: string
 }
 
 export class PostUserSignInRequest {
-	@ApiProperty({ type: String, nullable: true })
+	@IsDefined()
+	@ApiProperty({ type: String, nullable: false })
 	account: string
 
-	@ApiProperty({ type: String, nullable: true })
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
 	password: string
 }

@@ -33,12 +33,13 @@ export class YoutubeTimestampEntity {
 	@Column('varchar', {
 		nullable: false,
 		comment: '처리상태',
+		default: YoutubeTimestampStatus.NOT_COMPLETED,
 	})
 	status: YoutubeTimestampStatus
 
 	@Column('json', {
 		nullable: false,
-		comment: '영상 재생 시간',
+		comment: 'timestamp list',
 	})
 	timestamps: TimeStampModel[]
 

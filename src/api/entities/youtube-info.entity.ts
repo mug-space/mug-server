@@ -30,7 +30,7 @@ export class YoutubeInfoEntity {
 		nullable: false,
 		comment: '전체 자막 데이터',
 	})
-	captions: Caption
+	captions: Caption[]
 
 	@CreateDateColumn()
 	createdAt: Date
