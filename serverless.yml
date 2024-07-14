@@ -59,10 +59,11 @@ provider:
 
 functions:
   api:
-    image:
-      name: latest
-      command:
-        - dist/lambda.handler
+    handler: dist/main.handler
+    # image:
+    #   name: latest
+      # command:
+      #   - dist/lambda.handler
       # entryPoint:
       #   - '/lambda-entrypoint.sh'
     events:
