@@ -52,6 +52,7 @@ provider:
             - "s3:PutObject"
             - "s3:GetObject"
             - "s3:DeleteObject"
+            - lambda:InvokeFunction
           Resource: "*"
   apiGateway:
     binaryMediaTypes:
@@ -62,8 +63,6 @@ functions:
     handler: dist/main.handler
     # image:
     #   name: latest
-      # command:
-      #   - dist/lambda.handler
       # entryPoint:
       #   - '/lambda-entrypoint.sh'
     events:

@@ -7,6 +7,9 @@ import { TypeOrmExModule } from './type-orm-ex.module'
 import { addTransactionalDataSource } from 'typeorm-transactional'
 import { DataSource } from 'typeorm'
 import { UserRepository } from 'src/api/repositories/user.repository'
+import { YoutubeRepository } from 'src/api/repositories/youtube.repository'
+import { YoutubeInfoRepository } from 'src/api/repositories/youtube-info.repository'
+import { YoutubeTimestampRepository } from 'src/api/repositories/youtube-timestamp.repository'
 
 @Module({
 	imports: [
@@ -20,7 +23,7 @@ import { UserRepository } from 'src/api/repositories/user.repository'
 			},
 		}),
 		TypeOrmExModule.forCustomRepository([
-			UserRepository,
+			UserRepository, YoutubeRepository, YoutubeInfoRepository, YoutubeTimestampRepository,
 
 		]),
 	],
