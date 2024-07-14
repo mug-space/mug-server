@@ -7,7 +7,7 @@ import { YoutubeTranscript } from 'youtube-transcript'
 import { plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
 import { HttpService } from '@nestjs/axios'
-import AWS from 'aws-sdk'
+import AWS from '@aws-sdk/client-lambda'
 
 @Injectable()
 export class YoutubeService {
@@ -104,8 +104,9 @@ export class YoutubeService {
 		  const data = {
 			youtubeTimestampId, youtubeId,
 		  }
+
 		  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',
 			InvokeArgs: JSON.stringify({ target: 'youtube-timestamp',
-				data: data }) }).promise()
+				data: data }) })
 	}
 }
