@@ -21,6 +21,8 @@ package:
     - '!node_modules/@types/**'
     - '!node_modules/serverless/**'
     - '!node_modules/serverless-*/**'
+    - '!node_modules/.cache/**'
+    - '!node_modules/aws-sdk/**'
 
 provider:
   name: aws
@@ -34,11 +36,12 @@ provider:
   stage: ${opt:stage, 'prod'}
   deploymentBucket:
     name: mug-space-server-lambda-${opt:stage, 'prod'}
-  ecr:
-    images:
-      latest:
-        path: ./
-        # platform: linux/amd64
+
+  # ecr:
+  #   images:
+  #     latest:
+  #       path: ./
+  #       # platform: linux/amd64
   iam:
     role:
       statements:
@@ -61,6 +64,15 @@ provider:
 functions:
   api:
     handler: dist/main.handler
+    package:
+      patterns:
+        - '!.git/**'
+        - '!src/**'
+        - '!node_modules/@types/**'
+        - '!node_modules/serverless/**'
+        - '!node_modules/serverless-*/**'
+        - '!node_modules/.cache/**'
+        - '!node_modules/aws-sdk/**'
     # image:
     #   name: latest
       # entryPoint:
