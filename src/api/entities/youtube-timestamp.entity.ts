@@ -24,7 +24,7 @@ export class YoutubeTimestampEntity {
 	})
 	id: number
 
-	@Column('number', {
+	@Column('int', {
 		nullable: false,
 		comment: 'youtubes ID',
 	})

@@ -3,6 +3,7 @@ import {
 	CreateDateColumn,
 	DeleteDateColumn,
 	Entity,
+	Generated,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
@@ -18,6 +19,7 @@ export class UserEntity {
 		nullable: false,
 		comment: 'user uuid',
 	})
+	@Generated('uuid')
 	uuid: string
 
 	@Column('varchar', {

@@ -60,7 +60,7 @@ provider:
 functions:
   api:
     image:
-      # name: latest
+      name: latest
       command:
         - dist/lambda.handler
       # entryPoint:
