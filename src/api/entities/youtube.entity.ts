@@ -19,11 +19,11 @@ export class YoutubeEntity {
 	})
 	videoId: string
 
-	@Column('varchar', {
+	@Column('int', {
 		nullable: false,
-		comment: '영상 재생 시간',
+		comment: 'users ID',
 	})
-	duration: string
+	userId: number
 
 	@CreateDateColumn()
 	createdAt: Date

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, NotFoundException, Post, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Inject, NotFoundException, Param, Post, Put, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
@@ -16,11 +16,19 @@ export class YoutubeTimestampController {
 
 	// TODO: youtube timestamp 생성
 	async generateYoutubeTimestamp() {
+		// mug-lambda youtube-timestamp-generate lambda-call
+		return true
+	}
+
+	// TODO: youtube timestamp status update
+	@Put(':id(\\d+)')
+	async updateYoutubeTimestampStatus(@Param('id') id: number) {
 
 	}
 
 	// TODO: youtube 처리 결과 상세 정보
-	async getYoutubeTimestampDetail() {
+	@Get(':id(\\d+)')
+	async getYoutubeTimestampDetail(@Param('id') id: number) {
 
 	}
 

@@ -6,6 +6,13 @@ import {
 	UpdateDateColumn,
 } from 'typeorm'
 
+export class Caption {
+	text: string
+	duration: number
+	offset: number
+	lang?: string
+}
+
 @Entity('youtubeInfos')
 export class YoutubeInfoEntity {
 	@PrimaryGeneratedColumn({
@@ -19,11 +26,11 @@ export class YoutubeInfoEntity {
 	})
 	youtubeId: number
 
-	@Column('text', {
+	@Column('json', {
 		nullable: false,
-		comment: '전체 자막',
+		comment: '전체 자막 데이터',
 	})
-	caption: string
+	captions: Caption
 
 	@CreateDateColumn()
 	createdAt: Date

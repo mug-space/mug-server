@@ -11,6 +11,12 @@ class TimeStampModel {
 	title: string
 }
 
+export enum YoutubeTimestampStatus {
+	NOT_COMPLETED = 'NOT_COMPLETED',
+	ERROR = 'ERROR',
+	COMPLETED = 'COMPLETED',
+}
+
 @Entity('youtubeTimestamps')
 export class YoutubeTimestampEntity {
 	@PrimaryGeneratedColumn({
@@ -23,6 +29,12 @@ export class YoutubeTimestampEntity {
 		comment: 'youtubes ID',
 	})
 	youtubeId: number
+
+	@Column('varchar', {
+		nullable: false,
+		comment: '처리상태',
+	})
+	status: YoutubeTimestampStatus
 
 	@Column('json', {
 		nullable: false,
