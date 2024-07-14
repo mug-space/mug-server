@@ -32,6 +32,7 @@ provider:
   timeout: 900
   environment:
     STAGE: ${opt:stage, 'prod'}
+    NODE_ENV: production
   region: ap-northeast-2
   stage: ${opt:stage, 'prod'}
   deploymentBucket:
