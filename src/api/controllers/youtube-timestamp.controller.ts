@@ -54,13 +54,14 @@ export class YoutubeTimestampController {
 	// TODO: youtube timestamp status update
 	@Put(':id(\\d+)')
 	async updateYoutubeTimestampStatus(@Param('id') id: number) {
+		console.log(id)
 
 	}
 
 	// TODO: youtube 처리 결과 상세 정보
 	@Get(':id(\\d+)')
 	async getYoutubeTimestampDetail(@Param('id') id: number) {
-
+		console.log(id)
 	}
 
 }
