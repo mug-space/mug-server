@@ -71,7 +71,7 @@ functions:
         - '!src/**'
         - '!node_modules/@types/**'
         - '!node_modules/serverless/**'
-        - '!node_modules/serverless-*/**'
+        - '!node_modules/serverless-domain-manager/**'
         - '!node_modules/.cache/**'
         - '!node_modules/aws-sdk/**'
     # image:
