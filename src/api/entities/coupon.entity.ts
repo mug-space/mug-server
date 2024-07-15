@@ -2,6 +2,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	Generated,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
@@ -17,6 +18,7 @@ export class CouponEntity {
 		nullable: false,
 		comment: 'Coupon uuid',
 	})
+	@Generated('uuid')
 	uuid: string
 
 	@Column('boolean', {

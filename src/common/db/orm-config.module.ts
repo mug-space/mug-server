@@ -14,6 +14,7 @@ import { CouponRepository } from 'src/api/repositories/coupon.repository'
 import { InquiryRepository } from 'src/api/repositories/inquiry.repository'
 import { PaymentRepository } from 'src/api/repositories/payment.repository'
 import { PointLogRepository } from 'src/api/repositories/point-log.repository'
+import { ProductRepository } from 'src/api/repositories/product.repository'
 
 @Module({
 	imports: [
@@ -28,7 +29,7 @@ import { PointLogRepository } from 'src/api/repositories/point-log.repository'
 		}),
 		TypeOrmExModule.forCustomRepository([
 			UserRepository, YoutubeRepository, YoutubeInfoRepository, YoutubeTimestampRepository,
-			CouponRepository, InquiryRepository, PaymentRepository, PointLogRepository,
+			CouponRepository, InquiryRepository, PaymentRepository, PointLogRepository, ProductRepository,
 
 		]),
 	],

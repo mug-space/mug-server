@@ -14,15 +14,18 @@ import { YoutubeTimestampController } from './controllers/youtube-timestamp.cont
 import { YoutubeService } from './services/youtube.service'
 import { PaymentService } from './services/payment.service'
 import { CouponService } from './services/coupon.service'
+import { ProductController } from './controllers/product.controller'
+import { ProductService } from './services/product.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
-	InquiryController, PointController, YoutubeTimestampController,
+	InquiryController, PointController, YoutubeTimestampController, ProductController,
 ]
 @Module({
 	imports: [ CommonModule ],
 	controllers: [ ...controllers ],
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
+		ProductService,
 	],
 	exports: [],
 })
