@@ -10,6 +10,7 @@ import { PaymentService } from '../services/payment.service'
 
 @Controller('payments')
 @ApiTags('Billing')
+@UseGuards(JwtAuthGuard)
 export class PaymentController {
 
 	@Inject()
@@ -29,7 +30,7 @@ export class PaymentController {
 		const { paymentKey, orderId, amount } = body
 		const payment = await this.paymentService.confirmPayment(orderId, paymentKey, amount)
 		if (payment) {
-
+			// db payment insert
 		}
 	}
 

@@ -17,4 +17,16 @@ export class ProductService {
 		})
 		return plainToInstance(ProductModel, products, { excludeExtraneousValues: true })
 	}
+
+	async generateOrderId(productId: number) {
+		const product = await this.productRepository.findOne({ where: {
+			id: productId, enabled: true,
+		} })
+		if (product) {
+			const milliseconds = new Date().valueOf()
+			return `MUG-${productId}-${milliseconds}`
+		}
+		return null
+
+	}
 }
