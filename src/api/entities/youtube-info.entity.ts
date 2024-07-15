@@ -5,6 +5,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 export class Caption {
 	text: string
@@ -32,10 +33,14 @@ export class YoutubeInfoEntity {
 	})
 	captions: Caption[]
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
 }

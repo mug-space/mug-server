@@ -20,7 +20,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 		errorResponse.error = exception.constructor.name
 		this.logger.error(exception)
 		this.logger.error(errorResponse)
-		console.log((exception as any).response?.data)
+		console.error((exception as any).response?.data)
 		ctx.getResponse().status(httpStatus).json(errorResponse)
 		// httpAdapter.reply(ctx.getResponse(), errorResponse, httpStatus)
 	}

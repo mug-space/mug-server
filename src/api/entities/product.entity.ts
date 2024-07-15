@@ -5,6 +5,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 @Entity('products')
 export class ProductEntity {
@@ -38,10 +39,14 @@ export class ProductEntity {
 	})
 	point: number
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
 }

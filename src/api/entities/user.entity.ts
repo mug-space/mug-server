@@ -7,6 +7,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 @Entity('users')
 export class UserEntity {
@@ -50,13 +51,19 @@ export class UserEntity {
 	})
 	point: number
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
-	@DeleteDateColumn()
-	deletedAt: Date | null
+	@DeleteDateColumn({
+		transformer: new DateTransformer(),
+	})
+	deletedAt: number | null
 
 }

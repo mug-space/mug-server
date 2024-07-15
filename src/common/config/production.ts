@@ -1,7 +1,7 @@
 export default () => {
 	return {
 		NODE_ENV: 'production',
-		DATABASE_LOGGING: false,
+		DATABASE_LOGGING: true,
 		DATABASE_SCHEMA: 'mugspace',
 		CLIENT_HOST: 'mug-space.io',
 		CLIENT_URL: 'https://mug-space.io',

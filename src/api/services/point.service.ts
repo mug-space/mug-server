@@ -16,10 +16,7 @@ export class PointService {
 		const pointLogs = await this.pointLogRepository.find({ where: {
 			userId,
 		}, order: { id: 'DESC' } })
-		return pointLogs.map((pointLog) => plainToInstance(PointLogModel, {
-			...pointLog,
-			createdAt: pointLog.createdAt.valueOf(),
-		}))
+		return pointLogs.map((pointLog) => plainToInstance(PointLogModel, pointLog, { excludeExtraneousValues: true }))
 
 	}
 }

@@ -5,6 +5,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 class TimeStampModel {
 	time: string
@@ -43,10 +44,14 @@ export class YoutubeTimestampEntity {
 	})
 	timestamps: TimeStampModel[]
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
 }

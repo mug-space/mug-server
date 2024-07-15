@@ -10,23 +10,24 @@ import { PaymentController } from './controllers/payment.controller'
 import { CouponController } from './controllers/coupon.controller'
 import { InquiryController } from './controllers/inquiry.controller'
 import { PointController } from './controllers/point.controller'
-import { YoutubeTimestampController } from './controllers/youtube-timestamp.controller'
+import { YoutubeController } from './controllers/youtube.controller'
 import { YoutubeService } from './services/youtube.service'
 import { PaymentService } from './services/payment.service'
 import { CouponService } from './services/coupon.service'
 import { ProductController } from './controllers/product.controller'
 import { ProductService } from './services/product.service'
 import { PointService } from './services/point.service'
+import { InquiryService } from './services/inquiry.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
-	InquiryController, PointController, YoutubeTimestampController, ProductController,
+	InquiryController, PointController, YoutubeController, ProductController,
 ]
 @Module({
 	imports: [ CommonModule ],
 	controllers: [ ...controllers ],
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
-		ProductService, PointService,
+		ProductService, PointService, InquiryService,
 	],
 	exports: [],
 })

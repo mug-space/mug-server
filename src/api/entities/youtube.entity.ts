@@ -5,6 +5,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 @Entity('youtubes')
 export class YoutubeEntity {
@@ -25,10 +26,14 @@ export class YoutubeEntity {
 	})
 	userId: number
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
 }

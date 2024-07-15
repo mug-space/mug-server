@@ -8,6 +8,7 @@ import { plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
 import { HttpService } from '@nestjs/axios'
 import AWS from '@aws-sdk/client-lambda'
+import { YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
 
 @Injectable()
 export class YoutubeService {
@@ -60,6 +61,16 @@ export class YoutubeService {
 		const youtubeTimestamp = this.youtubeTimestampRepository.create({ youtubeId })
 		await this.youtubeTimestampRepository.save(youtubeTimestamp)
 		return youtubeTimestamp.id
+	}
+
+	async modifyYoutubeTimestampStatus(youtubeId: number, youtubeTimestampId: number, status: YoutubeTimestampStatus) {
+		const timestamp = await this.youtubeTimestampRepository.findOne({ where: {
+			id: youtubeTimestampId, youtubeId,
+		} })
+		if (timestamp) {
+			timestamp.status = status
+			await this.youtubeTimestampRepository.save(timestamp)
+		}
 	}
 
 	getVideoIdFromUrl(url: string) {

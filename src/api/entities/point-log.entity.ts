@@ -4,6 +4,7 @@ import {
 	Entity,
 	PrimaryGeneratedColumn,
 } from 'typeorm'
+import { DateTransformer } from './date.transformer'
 
 export enum PointLogType {
 	사용 = 'MINUS',
@@ -35,7 +36,9 @@ export class PointLogEntity {
 	})
 	type: PointLogType
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
 }

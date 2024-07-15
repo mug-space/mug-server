@@ -1,19 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Expose } from 'class-transformer'
-import { PointLogType } from 'src/api/entities/point-log.entity'
 
-export class PointLogModel {
+export class InquiryModel {
 	@Expose()
 	@ApiProperty({ type: Number })
 	id: number
 
 	@Expose()
-	@ApiProperty({ enum: PointLogType })
-	type: PointLogType
+	@ApiProperty()
+	title: string
 
 	@Expose()
 	@ApiProperty()
-	point: number
+	content: string
+
+	@Expose()
+	@ApiProperty({ type: String, nullable: true })
+	answer: string | null
 
 	@Expose()
 	@ApiProperty()

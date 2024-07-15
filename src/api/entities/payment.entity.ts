@@ -7,6 +7,7 @@ import {
 	UpdateDateColumn,
 } from 'typeorm'
 import { TossPayment } from '../dtos/models/toss-payment.dto'
+import { DateTransformer } from './date.transformer'
 
 @Entity('payments')
 export class PaymentEntity {
@@ -63,11 +64,15 @@ export class PaymentEntity {
 	})
 	paymentInfo: TossPayment
 
-	@CreateDateColumn()
-	createdAt: Date
+	@CreateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	createdAt: number
 
-	@UpdateDateColumn()
-	updatedAt: Date
+	@UpdateDateColumn({
+		transformer: new DateTransformer(),
+	})
+	updatedAt: number
 
 }
 
