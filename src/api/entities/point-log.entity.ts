@@ -1,11 +1,14 @@
 import {
 	Column,
 	CreateDateColumn,
-	DeleteDateColumn,
 	Entity,
 	PrimaryGeneratedColumn,
-	UpdateDateColumn,
 } from 'typeorm'
+
+export enum PointLogType {
+	사용 = 'MINUS',
+	충전 = 'PLUS',
+}
 
 @Entity('pointLogs')
 export class PointLogEntity {
@@ -22,14 +25,17 @@ export class PointLogEntity {
 
 	@Column('int', {
 		nullable: false,
-		comment: '사용 포인트',
+		comment: '사용 / 충전 포인트',
 	})
 	point: number
 
+	@Column('varchar', {
+		nullable: false,
+		comment: '사용, 충전 여부 타입',
+	})
+	type: PointLogType
+
 	@CreateDateColumn()
 	createdAt: Date
-
-	@UpdateDateColumn()
-	updatedAt: Date
 
 }
