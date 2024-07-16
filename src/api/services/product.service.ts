@@ -18,6 +18,28 @@ export class ProductService {
 		return plainToInstance(ProductModel, products, { excludeExtraneousValues: true })
 	}
 
+	async getPointByOrderId(orderid: string) {
+		const productId = this.extractProductId(orderid)
+		if (productId) {
+			const product = await this.productRepository.findOne({ where: { id: productId } })
+			if (product) {
+				return product.point
+			}
+		}
+		return null
+	}
+
+	extractProductId(orderId: string): number | null {
+		const parts = orderId.split('-')
+		if (parts.length === 3 && parts[0] === 'MUG') {
+			const productId = parseInt(parts[1], 10)
+			if (!isNaN(productId)) {
+				return productId
+			}
+		}
+		return null
+	}
+
 	async generateOrderId(productId: number) {
 		const product = await this.productRepository.findOne({ where: {
 			id: productId, enabled: true,

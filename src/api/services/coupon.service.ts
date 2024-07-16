@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { CouponRepository } from '../repositories/coupon.repository'
 import { UserRepository } from '../repositories/user.repository'
+import { PointLogRepository } from '../repositories/point-log.repository'
+import { PointLogType } from '../entities/point-log.entity'
 
 @Injectable()
 export class CouponService {
@@ -10,6 +12,8 @@ export class CouponService {
 	private readonly couponRepository: CouponRepository
 	@InjectRepository(UserRepository)
 	private readonly userRepository: UserRepository
+	@InjectRepository(PointLogRepository)
+	private readonly pointLogRepository: PointLogRepository
 
 	async applyCoupon(couponUuid: string, userId: number) {
 		const coupon = await this.couponRepository.findOne({ where: {
@@ -17,12 +21,9 @@ export class CouponService {
 			isUse: false,
 		} })
 		if (coupon) {
-			const user = await this.userRepository.findOne({ where: {
-				id: userId,
-			} })
-			if (user) {
-				user.point = user.point + 400
-				await this.userRepository.save(user)
+			const result = await this.userRepository.incrementPoint(userId, 400)
+			await this.pointLogRepository.savePointLog(userId, 400, PointLogType.충전)
+			if (result) {
 				coupon.isUse = true
 				await this.couponRepository.save(coupon)
 				return true

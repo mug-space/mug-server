@@ -2,10 +2,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
 import { DateTransformer } from './date.transformer'
+import { YoutubeEntity } from './youtube.entity'
 
 export class Caption {
 	text: string
@@ -42,5 +45,9 @@ export class YoutubeInfoEntity {
 		transformer: new DateTransformer(),
 	})
 	updatedAt: number
+
+	@OneToOne(() => YoutubeEntity, youtube => youtube.youtubeInfo, { createForeignKeyConstraints: false })
+	@JoinColumn({ name: 'youtubeId' })
+	youtube: YoutubeEntity
 
 }

@@ -6,14 +6,14 @@ export class PostAuthSignUpResponse {
 	static readonly builder = () => Builder(this)
 
 	@ApiProperty()
-	token: string
+	result: boolean
 }
 
 export class PostAuthSignInResponse {
 	static readonly builder = () => Builder(this)
 
 	@ApiProperty()
-	token: string
+	result: boolean
 }
 
 export class PostAuthSignUpRequest {

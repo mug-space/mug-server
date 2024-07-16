@@ -16,7 +16,6 @@ export class CouponController {
 	@Inject()
 	private readonly couponService: CouponService
 
-	// TODO: coupon 처리
 	@Post('apply')
 	@ApiOperation({ summary: 'coupon 적용' })
 	@CommonResponse({ type: PostCouponApplyResponse })

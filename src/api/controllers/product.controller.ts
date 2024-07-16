@@ -14,7 +14,6 @@ export class ProductController {
 	@Inject()
 	private readonly productService: ProductService
 
-	// TODO: 결제 상품 목록
 	@Get()
 	@ApiOperation({ summary: '결제(포인트충전) 상품 목록' })
 	@CommonResponse({ type: GetProductListResponse })

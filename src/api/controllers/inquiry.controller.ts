@@ -14,7 +14,6 @@ export class InquiryController {
 	@Inject()
 	private readonly inquiryService: InquiryService
 
-	// TODO: 문의 등록
 	@Post()
 	@ApiOperation({ summary: '문의 등록' })
 	@CommonResponse({ type: Boolean })
@@ -23,7 +22,6 @@ export class InquiryController {
 		return true
 	}
 
-	// TODO: 내 문의 목록
 	@Get()
 	@ApiOperation({ summary: '문의 목록' })
 	@CommonResponse({ type: GetInquiryListResponse })
@@ -34,7 +32,6 @@ export class InquiryController {
 			.build()
 	}
 
-	// TODO: 문의 상세
 	@Get(':id(\\d+)')
 	@ApiOperation({ summary: '문의 상세' })
 	@CommonResponse({ type: GetInquiryDetailResponse })

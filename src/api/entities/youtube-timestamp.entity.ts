@@ -2,12 +2,15 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
 import { DateTransformer } from './date.transformer'
+import { YoutubeEntity } from './youtube.entity'
 
-class TimeStampModel {
+export class TimeStampModel {
 	time: string
 	title: string
 }
@@ -53,5 +56,9 @@ export class YoutubeTimestampEntity {
 		transformer: new DateTransformer(),
 	})
 	updatedAt: number
+
+	@OneToOne(() => YoutubeEntity, youtube => youtube.youtubeTimestamp, { createForeignKeyConstraints: false })
+	@JoinColumn({ name: 'youtubeId' })
+	youtube: YoutubeEntity
 
 }

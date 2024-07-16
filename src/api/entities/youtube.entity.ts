@@ -2,10 +2,13 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
 import { DateTransformer } from './date.transformer'
+import { YoutubeInfoEntity } from './youtube-info.entity'
+import { YoutubeTimestampEntity } from './youtube-timestamp.entity'
 
 @Entity('youtubes')
 export class YoutubeEntity {
@@ -35,5 +38,11 @@ export class YoutubeEntity {
 		transformer: new DateTransformer(),
 	})
 	updatedAt: number
+
+	@OneToOne(() => YoutubeInfoEntity, info => info.youtube, { cascade: true })
+	youtubeInfo: YoutubeInfoEntity | null
+
+	@OneToOne(() => YoutubeTimestampEntity, timestamp => timestamp.youtube, { cascade: true })
+	youtubeTimestamp: YoutubeTimestampEntity | null
 
 }
