@@ -6,7 +6,7 @@ import { JwtModule } from '@nestjs/jwt'
 		global: true,
 		secret: 'mugspace',
 		signOptions: {
-		  expiresIn: '60m',
+		  expiresIn: '30d',
 		},
 	  }) ],
 	exports: [ JwtModule ],

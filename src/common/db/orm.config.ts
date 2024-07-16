@@ -23,7 +23,7 @@ export default class TypeOrmConfig implements TypeOrmOptionsFactory {
 			bigNumberStrings: false,
 			maxQueryExecutionTime: 5000,
 			extra: {
-				connectionLimit: Number(this.configService.get('DATABASE_POOL_SIZE', 1)) * 1,
+				connectionLimit: Number(this.configService.get('DATABASE_POOL_SIZE', 2)),
 				decimalNumbers: true,
 			},
 		}

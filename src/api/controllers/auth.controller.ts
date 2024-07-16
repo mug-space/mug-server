@@ -34,7 +34,7 @@ export class AuthController {
 			httpOnly: true,
 			secure: true,
 			sameSite: 'none',
-			domain: '.mug-space.io',
+			domain: this.configService.get('CLIENT_HOST'),
 		})
 		return PostAuthSignInResponse.builder()
 			.result(true)
@@ -52,11 +52,11 @@ export class AuthController {
 			httpOnly: true,
 			secure: true,
 			sameSite: 'none',
-			domain: '.mug-space.io',
+			domain: this.configService.get('CLIENT_HOST'),
 		})
 		res.cookie('is_signin', true, {
 			maxAge: 1000 * 60 * 60 * 24 * 60, // 30일
-			domain: '.mug-space.io',
+			domain: this.configService.get('CLIENT_HOST'),
 		})
 		return PostAuthSignUpResponse.builder()
 			.result(true)
