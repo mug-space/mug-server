@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Builder } from 'builder-pattern'
 import { IsDefined, IsEnum } from 'class-validator'
 import { YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
-import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel } from './models/youtube.model'
+import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel, YoutubeTimestampModel } from './models/youtube.model'
 
 export class GetYoutubeCaptionListResponse {
 
@@ -43,14 +43,16 @@ export class PostYoutubeTimestampGenerateResponse {
 }
 
 export class PutYoutubeUpdateTimestampStatusRequest {
-	@ApiProperty()
-	@IsDefined()
-	youtubeTimestampId: number
-
 	@ApiProperty({ enum: YoutubeTimestampStatus })
 	@IsDefined()
 	@IsEnum(YoutubeTimestampStatus)
 	status: YoutubeTimestampStatus
+}
+
+export class PutYoutubeUpdateTimestampListRequest {
+	@ApiProperty({ type: YoutubeTimestampModel, isArray: true })
+	@IsDefined()
+	timestamps: YoutubeTimestampModel[]
 }
 
 export class GetYoutubeListResponse {

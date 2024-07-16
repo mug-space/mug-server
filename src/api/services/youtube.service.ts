@@ -9,7 +9,7 @@ import { Caption } from '../entities/youtube-info.entity'
 import { HttpService } from '@nestjs/axios'
 import AWS from '@aws-sdk/client-lambda'
 import { TimeStampModel, YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
-import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel } from '../dtos/models/youtube.model'
+import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel, YoutubeTimestampModel } from '../dtos/models/youtube.model'
 
 @Injectable()
 export class YoutubeService {
@@ -102,18 +102,28 @@ export class YoutubeService {
 	}
 
 	async addYoutubeTimestamp(youtubeId: number) {
-		const youtubeTimestamp = this.youtubeTimestampRepository.create({ youtubeId })
+		const youtubeTimestamp = this.youtubeTimestampRepository.create({ youtubeId, timestamps: [] })
 		await this.youtubeTimestampRepository.save(youtubeTimestamp)
 		return youtubeTimestamp.id
 	}
 
-	async modifyYoutubeTimestampStatus(youtubeId: number, youtubeTimestampId: number, status: YoutubeTimestampStatus) {
+	async modifyYoutubeTimestampStatus(youtubeId: number, status: YoutubeTimestampStatus) {
 		const timestamp = await this.youtubeTimestampRepository.findOne({ where: {
-			id: youtubeTimestampId, youtubeId,
+			youtubeId,
 		} })
 		if (timestamp) {
 			timestamp.status = status
 			await this.youtubeTimestampRepository.save(timestamp)
+		}
+	}
+
+	async modifyYoutubeTimestampList(youtubeId: number, timestamps: YoutubeTimestampModel[]) {
+		const youtubeTimestamp = await this.youtubeTimestampRepository.findOne({ where: {
+			youtubeId,
+		} })
+		if (youtubeTimestamp) {
+			youtubeTimestamp.timestamps = timestamps
+			await this.youtubeTimestampRepository.save(youtubeTimestamp)
 		}
 	}
 

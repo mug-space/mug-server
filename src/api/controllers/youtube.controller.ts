@@ -6,6 +6,7 @@ import { CommonResponse } from 'src/common/response'
 import { GetYoutubeCaptionListResponse, GetYoutubeDetailResponse, GetYoutubeListResponse,
 	PostYoutubeCheckUrlRequest, PostYoutubeCheckUrlResponse,
 	PostYoutubeTimestampGenerateRequest, PostYoutubeTimestampGenerateResponse,
+	PutYoutubeUpdateTimestampListRequest,
 	PutYoutubeUpdateTimestampStatusRequest } from '../dtos/youtube.dto'
 import { YoutubeService } from '../services/youtube.service'
 import { UserModel } from '../dtos/models/user.model'
@@ -74,7 +75,15 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamp status update (for lambda)' })
 	@CommonResponse({ type: Boolean })
 	async updateYoutubeTimestampStatus(@Param('id') id: number, @Body() body: PutYoutubeUpdateTimestampStatusRequest) {
-		await this.youtubeService.modifyYoutubeTimestampStatus(id, body.youtubeTimestampId, body.status)
+		await this.youtubeService.modifyYoutubeTimestampStatus(id, body.status)
+		return true
+	}
+
+	@Put(':id(\\d+)/timestamps')
+	@ApiOperation({ summary: 'youtube timestamps update (for lambda)' })
+	@CommonResponse({ type: Boolean })
+	async updateYoutubeTimestamps(@Param('id') id: number, @Body() body: PutYoutubeUpdateTimestampListRequest) {
+		await this.youtubeService.modifyYoutubeTimestampList(id, body.timestamps)
 		return true
 	}
 

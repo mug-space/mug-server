@@ -2,6 +2,16 @@ import { ApiProperty } from '@nestjs/swagger'
 import { Expose } from 'class-transformer'
 import { YoutubeTimestampStatus } from 'src/api/entities/youtube-timestamp.entity'
 
+export class YoutubeTimestampModel {
+	@Expose()
+	@ApiProperty()
+	time: string
+
+	@Expose()
+	@ApiProperty()
+	title: string
+}
+
 export class YoutubeCaptionModel {
 	@Expose()
 	@ApiProperty()
