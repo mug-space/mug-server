@@ -179,24 +179,21 @@ export class YoutubeService {
 		const lambda = new Lambda({
 			region: 'ap-northeast-2',
 		})
-		const data = {
-			captions,
-		}
-		const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
-		if (result && result.data) {
-			return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
-		} else {
-			return null
-		}
-
-		// const resultLambda = await lambda.invoke(
-		// 	{ FunctionName: 'mug-space-task-prod-main',
-		// 		Payload: JSON.stringify({ target: 'youtube-timestamp-by-captions', data: { captions } }) }
-		// )
-		// if (resultLambda.Payload) {
-		// 	return plainToInstance(YoutubeTimestampModel, JSON.parse(resultLambda.Payload.toString()), { excludeExtraneousValues: true })
+		// const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
+		// if (result && result.data) {
+		// 	return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
+		// } else {
+		// 	return null
 		// }
-		// return null
+
+		const resultLambda = await lambda.invoke(
+			{ FunctionName: 'mug-space-task-prod-main',
+				Payload: JSON.stringify({ target: 'youtube-timestamp-by-captions', data: { captions } }) }
+		)
+		if (resultLambda.Payload) {
+			return plainToInstance(YoutubeTimestampModel, JSON.parse(resultLambda.Payload.toString()), { excludeExtraneousValues: true })
+		}
+		return null
 
 	}
 
