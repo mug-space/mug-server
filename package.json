@@ -6,8 +6,8 @@
 	"license": "UNLICENSED",
 	"scripts": {
 		"build": "yarn clean && nest build",
-		"start": "NODE_ENV=production AWS_PROFILE=mugspace nest start --watch",
-		"dev": "AWS_PROFILE=mugspace nest start --debug --watch",
+		"start": "NODE_ENV=local AWS_PROFILE=mugspace nest start --watch",
+		"start:prod": "NODE_ENV=production AWS_PROFILE=mugspace nest start --watch",
 		"clean": "rimraf dist",
 		"deploy": "sls deploy --aws-profile mugspace --stage prod",
 		"typeorm": "typeorm-ts-node-commonjs",

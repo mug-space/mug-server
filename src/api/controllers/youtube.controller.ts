@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, NotFoundException, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Param, Post, Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
@@ -13,7 +13,6 @@ import { UserModel } from '../dtos/models/user.model'
 
 @Controller('youtubes')
 @ApiTags('Youtube')
-@UseGuards(JwtAuthGuard)
 export class YoutubeController {
 
 	@Inject()
@@ -22,12 +21,13 @@ export class YoutubeController {
 	@Get()
 	@ApiOperation({ summary: '처리한 youtube list' })
 	@CommonResponse({ type: GetYoutubeListResponse })
+	@UseGuards(JwtAuthGuard)
 	async getYoutubeTimestampList(@CurrentUser() user: UserModel | null) {
 		if (!user) {
 			throw new UnauthorizedException('required login')
 		}
 		const youtubeList = await this.youtubeService.getYoutubeSimpleList(user.id)
-		GetYoutubeListResponse.builder()
+		return GetYoutubeListResponse.builder()
 			.youtubes(youtubeList)
 			.build()
 	}
@@ -49,6 +49,7 @@ export class YoutubeController {
 	@Post('check')
 	@ApiOperation({ summary: 'youtube url 을 입력받아서 처리 가능한 url일경우 youtube db 생성 후 youtube db Id return' })
 	@CommonResponse({ type: PostYoutubeCheckUrlResponse })
+	@UseGuards(JwtAuthGuard)
 	async checkYoutubeURL(@Body() body: PostYoutubeCheckUrlRequest, @CurrentUser() user: UserModel | null) {
 		if (!user) {
 			throw new UnauthorizedException('required login')
@@ -62,9 +63,14 @@ export class YoutubeController {
 	@Post('timestamp-generate')
 	@ApiOperation({ summary: 'youtube timestamp 생성' })
 	@CommonResponse({ type: PostYoutubeTimestampGenerateResponse })
+	@UseGuards(JwtAuthGuard)
 	async generateYoutubeTimestamp(@Body() body: PostYoutubeTimestampGenerateRequest) {
-		const youtubeTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
-		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, youtubeTimestampId)
+		const existTimestamp = await this.youtubeService.existYoutubeTimestamp(body.youtubeId)
+		if (existTimestamp) {
+			throw new BadRequestException('already generate timestamp')
+		}
+		await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
+		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId)
 		return PostYoutubeTimestampGenerateResponse.builder()
 			.result(true)
 			.build()
@@ -88,6 +94,7 @@ export class YoutubeController {
 	}
 
 	@Get(':id(\\d+)')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: 'youtube 처리 결과 상세 정보' })
 	@CommonResponse({ type: GetYoutubeDetailResponse })
 	async getYoutubeDetail(@CurrentUser() user: UserModel | null, @Param('id') id: number) {

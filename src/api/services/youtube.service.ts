@@ -101,6 +101,15 @@ export class YoutubeService {
 		return youtube.id
 	}
 
+	async existYoutubeTimestamp(youtubeId: number) {
+		return await this.youtubeTimestampRepository.exists({
+			where: {
+				youtubeId,
+			},
+		})
+
+	}
+
 	async addYoutubeTimestamp(youtubeId: number) {
 		const youtubeTimestamp = this.youtubeTimestampRepository.create({ youtubeId, timestamps: [] })
 		await this.youtubeTimestampRepository.save(youtubeTimestamp)
@@ -162,12 +171,15 @@ export class YoutubeService {
 
 	}
 
-	async invokeYoutubeTimestampLambda(youtubeId: number, youtubeTimestampId: number) {
+	async invokeYoutubeTimestampLambda(youtubeId: number) {
+
+		// await this.httpService.post('http://localhost:8001/generate-timestamp', { youtubeId }).toPromise()
+
 		const lambda = new Lambda({
 			region: 'ap-northeast-2',
 		  })
 		  const data = {
-			youtubeTimestampId, youtubeId,
+			youtubeId,
 		  }
 
 		  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',
@@ -176,15 +188,17 @@ export class YoutubeService {
 	}
 
 	async invokeYoutubeTimestampByCaptionsLambda(captions: YoutubeCaptionModel[]) {
-		const lambda = new Lambda({
-			region: 'ap-northeast-2',
-		})
+
 		// const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
 		// if (result && result.data) {
 		// 	return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
 		// } else {
 		// 	return null
 		// }
+
+		const lambda = new Lambda({
+			region: 'ap-northeast-2',
+		})
 
 		const resultLambda = await lambda.invoke(
 			{ FunctionName: 'mug-space-task-prod-main',

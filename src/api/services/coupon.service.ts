@@ -4,6 +4,7 @@ import { CouponRepository } from '../repositories/coupon.repository'
 import { UserRepository } from '../repositories/user.repository'
 import { PointLogRepository } from '../repositories/point-log.repository'
 import { PointLogType } from '../entities/point-log.entity'
+import { Transactional } from 'typeorm-transactional'
 
 @Injectable()
 export class CouponService {
@@ -15,6 +16,7 @@ export class CouponService {
 	@InjectRepository(PointLogRepository)
 	private readonly pointLogRepository: PointLogRepository
 
+	@Transactional()
 	async applyCoupon(couponUuid: string, userId: number) {
 		const coupon = await this.couponRepository.findOne({ where: {
 			uuid: couponUuid,
