@@ -7,7 +7,7 @@ import { YoutubeTranscript } from 'youtube-transcript'
 import { plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
 import { HttpService } from '@nestjs/axios'
-import AWS from '@aws-sdk/client-lambda'
+import { Lambda } from '@aws-sdk/client-lambda'
 import { TimeStampModel, YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
 import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel, YoutubeTimestampModel } from '../dtos/models/youtube.model'
 
@@ -163,7 +163,7 @@ export class YoutubeService {
 	}
 
 	async invokeYoutubeTimestampLambda(youtubeId: number, youtubeTimestampId: number) {
-		const lambda = new AWS.Lambda({
+		const lambda = new Lambda({
 			region: 'ap-northeast-2',
 		  })
 		  const data = {
@@ -173,6 +173,31 @@ export class YoutubeService {
 		  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',
 			InvokeArgs: JSON.stringify({ target: 'youtube-timestamp',
 				data: data }) })
+	}
+
+	async invokeYoutubeTimestampByCaptionsLambda(captions: YoutubeCaptionModel[]) {
+		const lambda = new Lambda({
+			region: 'ap-northeast-2',
+		})
+		const data = {
+			captions,
+		}
+		const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
+		if (result && result.data) {
+			return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
+		} else {
+			return null
+		}
+
+		// const resultLambda = await lambda.invoke(
+		// 	{ FunctionName: 'mug-space-task-prod-main',
+		// 		Payload: JSON.stringify({ target: 'youtube-timestamp-by-captions', data: { captions } }) }
+		// )
+		// if (resultLambda.Payload) {
+		// 	return plainToInstance(YoutubeTimestampModel, JSON.parse(resultLambda.Payload.toString()), { excludeExtraneousValues: true })
+		// }
+		// return null
+
 	}
 
 	private makeYoutubeTimestampString(timestamps: TimeStampModel[]) {
