@@ -10,6 +10,7 @@ import { HttpService } from '@nestjs/axios'
 import { Lambda } from '@aws-sdk/client-lambda'
 import { TimeStampModel, YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
 import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel, YoutubeTimestampModel } from '../dtos/models/youtube.model'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class YoutubeService {
@@ -22,6 +23,8 @@ export class YoutubeService {
 	private readonly youtubeTimestampRepository: YoutubeTimestampRepository
 	@Inject()
 	private readonly httpService: HttpService
+	@Inject()
+	private readonly configService: ConfigService
 
 	async getYoutubeCaptionList(youtubeId: number) {
 		const youtubeInfo = await this.youtubeInfoRepository.findOne({
@@ -173,41 +176,47 @@ export class YoutubeService {
 
 	async invokeYoutubeTimestampLambda(youtubeId: number) {
 
-		// await this.httpService.post('http://localhost:8001/generate-timestamp', { youtubeId }).toPromise()
+		if (this.configService.get('NODE_ENV') === 'local') {
+			await this.httpService.post('http://localhost:8001/generate-timestamp', { youtubeId }).toPromise()
+		} else {
+			const lambda = new Lambda({
+				region: 'ap-northeast-2',
+			  })
+			  const data = {
+				youtubeId,
+			  }
 
-		const lambda = new Lambda({
-			region: 'ap-northeast-2',
-		  })
-		  const data = {
-			youtubeId,
-		  }
+			  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',
+				InvokeArgs: JSON.stringify({ target: 'youtube-timestamp',
+					data: data }) })
+		}
 
-		  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',
-			InvokeArgs: JSON.stringify({ target: 'youtube-timestamp',
-				data: data }) })
 	}
 
 	async invokeYoutubeTimestampByCaptionsLambda(captions: YoutubeCaptionModel[]) {
 
-		// const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
-		// if (result && result.data) {
-		// 	return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
-		// } else {
-		// 	return null
-		// }
+		if (this.configService.get('NODE_ENV') === 'local') {
+			const result = await this.httpService.post('http://localhost:8001/generate-timestamp-by-captions', { captions }).toPromise()
+			if (result && result.data) {
+				return plainToInstance(YoutubeTimestampModel, result.data, { excludeExtraneousValues: true })
+			} else {
+				return null
+			}
+		} else {
+			const lambda = new Lambda({
+				region: 'ap-northeast-2',
+			})
 
-		const lambda = new Lambda({
-			region: 'ap-northeast-2',
-		})
-
-		const resultLambda = await lambda.invoke(
-			{ FunctionName: 'mug-space-task-prod-main',
-				Payload: JSON.stringify({ target: 'youtube-timestamp-by-captions', data: { captions } }) }
-		)
-		if (resultLambda.Payload) {
-			return plainToInstance(YoutubeTimestampModel, JSON.parse(resultLambda.Payload.toString()), { excludeExtraneousValues: true })
+			const resultLambda = await lambda.invoke(
+				{ FunctionName: 'mug-space-task-prod-main',
+					Payload: JSON.stringify({ target: 'youtube-timestamp-by-captions', data: { captions } }) }
+			)
+			if (resultLambda.Payload) {
+				return plainToInstance(YoutubeTimestampModel,
+					JSON.parse(resultLambda.Payload.toString()), { excludeExtraneousValues: true })
+			}
+			return null
 		}
-		return null
 
 	}
 
