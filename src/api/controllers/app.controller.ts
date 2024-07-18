@@ -37,7 +37,14 @@ export class AppController {
 		if (videoId) {
 			const captions = await this.youtubeService.getCaption(videoId)
 			if (captions) {
-				const captionModels = plainToInstance(YoutubeCaptionModel, captions)
+
+				const captionModels = plainToInstance(YoutubeCaptionModel, captions.map((caption) => {
+					return {
+						text: caption.text,
+						duration: Math.floor(caption.duration),
+						offset: Math.floor(caption.offset),
+					}
+				}))
 				const result = await this.youtubeService.invokeYoutubeTimestampByCaptionsLambda(captionModels)
 				return result
 			}

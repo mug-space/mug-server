@@ -24,10 +24,6 @@ export class YoutubeCaptionModel {
 	@Expose()
 	@ApiProperty()
 	offset: number
-
-	@Expose()
-	@ApiProperty()
-	lang: string
 }
 
 export class YoutubeSimpleModel {
