@@ -18,6 +18,7 @@ import { ProductController } from './controllers/product.controller'
 import { ProductService } from './services/product.service'
 import { PointService } from './services/point.service'
 import { InquiryService } from './services/inquiry.service'
+import { MailService } from './services/mail.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
 	InquiryController, PointController, YoutubeController, ProductController,
@@ -27,7 +28,7 @@ const controllers = [ AppController, AuthController, UserController, PaymentCont
 	controllers: [ ...controllers ],
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
-		ProductService, PointService, InquiryService,
+		ProductService, PointService, InquiryService, MailService,
 	],
 	exports: [],
 })

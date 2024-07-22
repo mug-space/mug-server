@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { YoutubeService } from '../services/youtube.service'
 import { plainToInstance } from 'class-transformer'
 import { YoutubeCaptionModel } from '../dtos/models/youtube.model'
+import { EmailParams, MailService } from '../services/mail.service'
 
 class YoutubeTestRequest {
 	@ApiProperty()
@@ -15,6 +16,8 @@ export class AppController {
 
 	@Inject()
 	private readonly youtubeService: YoutubeService
+	@Inject()
+	private readonly mailService: MailService
 
 	@Get('time')
 	async time() {
@@ -51,6 +54,19 @@ export class AppController {
 
 		}
 		return null
+	}
+
+	@Post('mail-test')
+	async mailTest() {
+
+		const emailParams: EmailParams = {
+			to: 'contact@mug-space.io',
+			from: 'contact@mug-space.io',
+			subject: 'Test HTML Email',
+			htmlBody: '<h1>Hello</h1><p>This is a test email.</p>',
+		}
+
+		await this.mailService.sendHtmlEmail(emailParams)
 
 	}
 
