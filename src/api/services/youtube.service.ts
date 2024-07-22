@@ -226,4 +226,55 @@ export class YoutubeService {
 			return prev
 		}, '')
 	}
+
+	private async getYoutubeDetailFromRapidAPI(videoId: string) {
+
+		const options = {
+			method: 'GET',
+			url: 'https://youtube-v2.p.rapidapi.com/video/details',
+			params: {
+			  video_id: videoId,
+			},
+			headers: {
+			  'x-rapidapi-key': '2817c39907msh6724e064079b7a2p186d24jsn076d1c7e2627',
+			  'x-rapidapi-host': 'youtube-v2.p.rapidapi.com',
+			},
+		  }
+
+		  try {
+			  const response = await this.httpService.request<RapidVideoDetail>(options).toPromise()
+			  if (response) {
+				console.log(response.data)
+				return response.data
+			  }
+			  return null
+
+		  } catch (error) {
+			  console.error(error)
+			  return null
+		  }
+	}
+}
+
+interface RapidVideoThumbnail {
+	url: string;
+	width: number;
+	height: number;
+}
+
+export class RapidVideoDetail {
+	video_id: string
+	title: string
+	author: string
+	number_of_views: number
+	video_length: string
+	description: string
+	is_live_content: string
+	published_time: string
+	channel_id: string
+	category: string
+	type: string = 'NORMAL'
+	keywords: string[]
+	thumbnails: RapidVideoThumbnail[]
+
 }
