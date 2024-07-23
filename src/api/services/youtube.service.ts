@@ -45,16 +45,17 @@ export class YoutubeService {
 			order: { id: 'DESC' },
 		})
 		return youtubeList.map((youtube) => {
+			const isCompleted = youtube.youtubeTimestamps.every((timestamp) => timestamp.status === YoutubeTimestampStatus.COMPLETED)
 			return plainToInstance(YoutubeSimpleModel, {
 				...youtube,
-				status: youtube.youtubeTimestamp ? youtube.youtubeTimestamp.status : YoutubeTimestampStatus.ERROR,
+				status: isCompleted ? YoutubeTimestampStatus.COMPLETED : YoutubeTimestampStatus.NOT_COMPLETED,
 			}, { excludeExtraneousValues: true })
 		})
 	}
 
 	async getYoutubeDetail(userId: number, youtubeId: number) {
 		const youtube = await this.youtubeRepository.findOne({
-			relations: [ 'youtubeTimestamp' ],
+			relations: [ 'youtubeTimestamps' ],
 			where: {
 				id: youtubeId, userId: userId,
 			},
@@ -62,10 +63,13 @@ export class YoutubeService {
 		if (!youtube) {
 			return null
 		}
+		const isCompleted = youtube.youtubeTimestamps.length === 2
+			&& youtube.youtubeTimestamps.every((timestamp) => timestamp.status === YoutubeTimestampStatus.COMPLETED)
 		return plainToInstance(YoutubeModel, {
 			...youtube,
-			status: youtube.youtubeTimestamp ? youtube.youtubeTimestamp.status : YoutubeTimestampStatus.ERROR,
-			timestampString: youtube.youtubeTimestamp ? this.makeYoutubeTimestampString(youtube.youtubeTimestamp.timestamps) : '',
+			status: isCompleted ? YoutubeTimestampStatus.COMPLETED : YoutubeTimestampStatus.NOT_COMPLETED,
+			firstTimestamps: isCompleted ? youtube.youtubeTimestamps[0].timestamps : [],
+			secondTimestamps: isCompleted ? youtube.youtubeTimestamps[1].timestamps : [],
 		}, { excludeExtraneousValues: true })
 	}
 
@@ -119,9 +123,9 @@ export class YoutubeService {
 		return youtubeTimestamp.id
 	}
 
-	async modifyYoutubeTimestampStatus(youtubeId: number, status: YoutubeTimestampStatus) {
+	async modifyYoutubeTimestampStatus(youtubeId: number, youtubeTimestampId: number, status: YoutubeTimestampStatus) {
 		const timestamp = await this.youtubeTimestampRepository.findOne({ where: {
-			youtubeId,
+			youtubeId, id: youtubeTimestampId,
 		} })
 		if (timestamp) {
 			timestamp.status = status
@@ -129,9 +133,9 @@ export class YoutubeService {
 		}
 	}
 
-	async modifyYoutubeTimestampList(youtubeId: number, timestamps: YoutubeTimestampModel[]) {
+	async modifyYoutubeTimestampList(youtubeId: number, youtubeTimestampId: number, timestamps: YoutubeTimestampModel[]) {
 		const youtubeTimestamp = await this.youtubeTimestampRepository.findOne({ where: {
-			youtubeId,
+			youtubeId, id: youtubeTimestampId,
 		} })
 		if (youtubeTimestamp) {
 			youtubeTimestamp.timestamps = timestamps
@@ -174,7 +178,7 @@ export class YoutubeService {
 
 	}
 
-	async invokeYoutubeTimestampLambda(youtubeId: number) {
+	async invokeYoutubeTimestampLambda(youtubeId: number, youtubeTimestampId: number, generateType: string) {
 
 		if (this.configService.get('NODE_ENV') === 'local') {
 			await this.httpService.post('http://localhost:8001/generate-timestamp', { youtubeId }).toPromise()
@@ -183,7 +187,7 @@ export class YoutubeService {
 				region: 'ap-northeast-2',
 			  })
 			  const data = {
-				youtubeId,
+				youtubeId, youtubeTimestampId, generateType,
 			  }
 
 			  await lambda.invokeAsync({ FunctionName: 'mug-space-task-prod-main',

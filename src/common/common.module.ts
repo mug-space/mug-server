@@ -4,10 +4,11 @@ import { APP_PIPE } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module'
 import { CommonConfigModule } from './config/common-config.module'
 import { TypeOrmConfigModule } from './db/orm-config.module'
+import { MailModule } from './mail/mail.module'
 import { ResponseModule } from './response/response.module'
 
 @Module({
-	imports: [ CommonConfigModule, TypeOrmConfigModule, ResponseModule, AuthModule, HttpModule ],
+	imports: [ CommonConfigModule, TypeOrmConfigModule, ResponseModule, AuthModule, HttpModule, MailModule ],
 	providers: [
 		{
 			provide: APP_PIPE,

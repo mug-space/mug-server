@@ -70,8 +70,10 @@ export class YoutubeController {
 		if (existTimestamp) {
 			throw new BadRequestException('already generate timestamp')
 		}
-		await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
-		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId)
+		const firstTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
+		const secondTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
+		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, firstTimestampId, 'openai')
+		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, secondTimestampId, 'claude')
 		return PostYoutubeTimestampGenerateResponse.builder()
 			.result(true)
 			.build()
@@ -82,7 +84,7 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamp status update (for lambda)' })
 	@CommonResponse({ type: Boolean })
 	async updateYoutubeTimestampStatus(@Param('id') id: number, @Body() body: PutYoutubeUpdateTimestampStatusRequest) {
-		await this.youtubeService.modifyYoutubeTimestampStatus(id, body.status)
+		await this.youtubeService.modifyYoutubeTimestampStatus(id, body.youtubeTimestampId, body.status)
 		return true
 	}
 
@@ -90,7 +92,7 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamps update (for lambda)' })
 	@CommonResponse({ type: Boolean })
 	async updateYoutubeTimestamps(@Param('id') id: number, @Body() body: PutYoutubeUpdateTimestampListRequest) {
-		await this.youtubeService.modifyYoutubeTimestampList(id, body.timestamps)
+		await this.youtubeService.modifyYoutubeTimestampList(id, body.youtubeTimestampId, body.timestamps)
 		return true
 	}
 

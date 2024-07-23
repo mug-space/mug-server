@@ -43,6 +43,11 @@ export class PostYoutubeTimestampGenerateResponse {
 }
 
 export class PutYoutubeUpdateTimestampStatusRequest {
+
+	@ApiProperty()
+	@IsDefined()
+	youtubeTimestampId: number
+
 	@ApiProperty({ enum: YoutubeTimestampStatus })
 	@IsDefined()
 	@IsEnum(YoutubeTimestampStatus)
@@ -50,6 +55,11 @@ export class PutYoutubeUpdateTimestampStatusRequest {
 }
 
 export class PutYoutubeUpdateTimestampListRequest {
+
+	@ApiProperty()
+	@IsDefined()
+	youtubeTimestampId: number
+
 	@ApiProperty({ type: YoutubeTimestampModel, isArray: true })
 	@IsDefined()
 	timestamps: YoutubeTimestampModel[]

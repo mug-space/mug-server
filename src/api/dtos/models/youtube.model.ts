@@ -60,7 +60,11 @@ export class YoutubeModel {
 
 	@Expose()
 	@ApiProperty()
-	timestampString: string
+	firstTimestamps: YoutubeTimestampModel[]
+
+	@Expose()
+	@ApiProperty()
+	secondTimestamps: YoutubeTimestampModel[]
 
 	@Expose()
 	@ApiProperty()

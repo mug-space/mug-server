@@ -2,6 +2,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	OneToMany,
 	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
@@ -42,7 +43,7 @@ export class YoutubeEntity {
 	@OneToOne(() => YoutubeInfoEntity, info => info.youtube, { cascade: true })
 	youtubeInfo: YoutubeInfoEntity | null
 
-	@OneToOne(() => YoutubeTimestampEntity, timestamp => timestamp.youtube, { cascade: true })
-	youtubeTimestamp: YoutubeTimestampEntity | null
+	@OneToMany(() => YoutubeTimestampEntity, timestamp => timestamp.youtube, { cascade: true })
+	youtubeTimestamps: YoutubeTimestampEntity[]
 
 }

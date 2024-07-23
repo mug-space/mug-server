@@ -58,15 +58,7 @@ export class AppController {
 
 	@Post('mail-test')
 	async mailTest() {
-
-		const emailParams: EmailParams = {
-			to: 'contact@mug-space.io',
-			from: 'contact@mug-space.io',
-			subject: 'Test HTML Email',
-			htmlBody: '<h1>Hello</h1><p>This is a test email.</p>',
-		}
-
-		await this.mailService.sendHtmlEmail(emailParams)
+		await this.mailService.sendUserConfirmation('kiseon1987@gmail.com')
 
 	}
 

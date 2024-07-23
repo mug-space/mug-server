@@ -3,6 +3,7 @@ import {
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
+	ManyToOne,
 	OneToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
@@ -57,7 +58,7 @@ export class YoutubeTimestampEntity {
 	})
 	updatedAt: number
 
-	@OneToOne(() => YoutubeEntity, youtube => youtube.youtubeTimestamp, { createForeignKeyConstraints: false })
+	@ManyToOne(() => YoutubeEntity, youtube => youtube.youtubeTimestamps, { createForeignKeyConstraints: false })
 	@JoinColumn({ name: 'youtubeId' })
 	youtube: YoutubeEntity
 
