@@ -12,7 +12,10 @@ export interface EmailParams {
 @Injectable()
 export class MailService {
 
-	constructor(private configService: ConfigService) {
+	private transporter: nodemailer.Transporter
+
+	constructor(
+		private readonly configService: ConfigService) {
 		this.transporter = nodemailer.createTransport({
 		  host: this.configService.get<string>('ZOHO_SMTP_HOST', 'smtp.zoho.com'),
 		  port: this.configService.get<number>('ZOHO_SMTP_PORT', 587),
@@ -23,9 +26,6 @@ export class MailService {
 		  },
 		})
 	}
-
-	@Inject()
-	private transporter: nodemailer.Transporter
 
 	async sendUserConfirmation(userEmail: string) {
 		const url = 'https://mug-space.io'
