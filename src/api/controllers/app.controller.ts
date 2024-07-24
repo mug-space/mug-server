@@ -58,7 +58,7 @@ export class AppController {
 
 	@Post('mail-test')
 	async mailTest() {
-		await this.mailService.sendUserConfirmation('kiseon1987@gmail.com')
+		await this.mailService.sendUserConfirmation('kiseon1987@gmail.com', '테스트명', '테스트유튜버', '쿠폰코드')
 
 	}
 
