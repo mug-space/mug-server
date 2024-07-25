@@ -17,6 +17,13 @@ export class PostPaymentConfirmRequest {
 	amount: number
 }
 
+export class PostPaymentConfirmResponse {
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty()
+	point: number
+}
+
 export class GetPaymentListResponse {
 
 	static readonly builder = () => Builder(this)

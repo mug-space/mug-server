@@ -114,7 +114,16 @@ export class YoutubeService {
 				youtubeId,
 			},
 		})
+	}
 
+	async getYoutubeTimestampPoint(youtubeId: number) {
+		const info = await this.youtubeInfoRepository.findOne({ where: {
+			youtubeId,
+		} })
+		if (info) {
+			return info.timestampPoint
+		}
+		return null
 	}
 
 	async addYoutubeTimestamp(youtubeId: number) {

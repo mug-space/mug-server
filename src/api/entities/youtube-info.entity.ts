@@ -36,6 +36,12 @@ export class YoutubeInfoEntity {
 	})
 	captions: Caption[]
 
+	@Column('int', {
+		nullable: false,
+		comment: '타임스탬프 생성에 필요한 포인트',
+	})
+	timestampPoint: number
+
 	@CreateDateColumn({
 		transformer: new DateTransformer(),
 	})

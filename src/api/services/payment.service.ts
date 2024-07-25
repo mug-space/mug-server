@@ -7,7 +7,7 @@ import { PaymentRepository } from '../repositories/payment.repository'
 import { plainToInstance } from 'class-transformer'
 import { PaymentModel } from '../dtos/models/payment.model'
 
-const SECRET_KEY = 'test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6'
+const SECRET_KEY = 'test_gsk_KNbdOvk5rky91oEepNG43n07xlzm'
 
 @Injectable()
 export class PaymentService {

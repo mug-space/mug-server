@@ -11,6 +11,8 @@ import { GetYoutubeCaptionListResponse, GetYoutubeDetailResponse, GetYoutubeList
 	PutYoutubeUpdateTimestampStatusRequest } from '../dtos/youtube.dto'
 import { YoutubeService } from '../services/youtube.service'
 import { UserModel } from '../dtos/models/user.model'
+import { PointService } from '../services/point.service'
+import { UserService } from '../services/user.service'
 
 @Controller('youtubes')
 @ApiTags('Youtube')
@@ -18,6 +20,10 @@ export class YoutubeController {
 
 	@Inject()
 	private readonly youtubeService: YoutubeService
+	@Inject()
+	private readonly pointService: PointService
+	@Inject()
+	private readonly userService: UserService
 
 	@Get()
 	@ApiOperation({ summary: '처리한 youtube list' })
@@ -58,6 +64,7 @@ export class YoutubeController {
 		const youtubeId = await this.youtubeService.checkUsableYoutube(body.url, user.id)
 		return PostYoutubeCheckUrlResponse.builder()
 			.youtubeId(youtubeId)
+			.timestampPoint(200)
 			.build()
 	}
 
@@ -65,17 +72,30 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamp 생성' })
 	@CommonResponse({ type: PostYoutubeTimestampGenerateResponse })
 	@UseGuards(JwtAuthGuard)
-	async generateYoutubeTimestamp(@Body() body: PostYoutubeTimestampGenerateRequest) {
+	async generateYoutubeTimestamp(@CurrentUser() user: UserModel | null, @Body() body: PostYoutubeTimestampGenerateRequest) {
+		if (!user) {
+			throw new UnauthorizedException('required login')
+		}
 		const existTimestamp = await this.youtubeService.existYoutubeTimestamp(body.youtubeId)
 		if (existTimestamp) {
 			throw new BadRequestException('already generate timestamp')
 		}
+		const timestampPoint = await this.youtubeService.getYoutubeTimestampPoint(body.youtubeId)
+		if (!timestampPoint) {
+			throw new NotFoundException('not found youtube info')
+		}
+		await this.pointService.decrementPoint(user.id, timestampPoint)
 		const firstTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
 		const secondTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
 		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, firstTimestampId, 'openai')
 		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, secondTimestampId, 'claude')
+		const u = await this.userService.getUserById(user.id)
+		if (!u) {
+			throw new NotFoundException('not found user')
+		}
 		return PostYoutubeTimestampGenerateResponse.builder()
 			.result(true)
+			.point(u.point)
 			.build()
 
 	}

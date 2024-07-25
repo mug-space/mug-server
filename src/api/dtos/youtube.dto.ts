@@ -25,6 +25,9 @@ export class PostYoutubeCheckUrlResponse {
 	@ApiProperty({ type: String, nullable: true })
 	youtubeId: number | null
 
+	@ApiProperty()
+	timestampPoint: number
+
 }
 
 export class PostYoutubeTimestampGenerateRequest {
@@ -39,6 +42,9 @@ export class PostYoutubeTimestampGenerateResponse {
 
 	@ApiProperty({ type: Boolean })
 	result: boolean
+
+	@ApiProperty()
+	point: number
 
 }
 
