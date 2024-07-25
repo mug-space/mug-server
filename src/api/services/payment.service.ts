@@ -20,7 +20,7 @@ export class PaymentService {
 	private readonly paymentRepository: PaymentRepository
 
 	async confirmPayment(orderId: string, paymentKey: string, amount: number) {
-		const secretKey = this.configService.get('TOSS_SECRET_KEY' || SECRET_KEY)
+		const secretKey = this.configService.get('TOSS_SECRET_KEY', SECRET_KEY)
 		const encryptedSecretKey =
     'Basic ' + Buffer.from(secretKey + ':').toString('base64')
 		const response = await this.httpService.post<TossPayment>('https://api.tosspayments.com/v1/payments/confirm',
