@@ -13,7 +13,7 @@ import { UserService } from '../services/user.service'
 
 @Controller('payments')
 @ApiTags('Billing')
-// @UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard)
 export class PaymentController {
 
 	@Inject()
