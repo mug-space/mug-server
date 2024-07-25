@@ -32,7 +32,8 @@ export const initApp = async () => {
 	app.use(express.urlencoded({ extended: true, limit: '30mb' }))
 	app.disable('x-powered-by')
 	const corsOptions = { origin: [
-		'https://localhost:3000', 'http://localhost:3000', 'http://localhost:8000' ], credentials: true }
+		'https://localhost:3000', 'http://localhost:3000', 'http://localhost:8000',
+		'https://mug-space.io', 'https://www.mug-space.io', 'https://mug-space.vercel.app' ], credentials: true }
 	app.use(cors(corsOptions))
 	const nestapp = await NestFactory.create(AppModule, new ExpressAdapter(app))
 	nestapp.enableShutdownHooks()
