@@ -36,6 +36,10 @@ export class AuthController {
 			sameSite: 'none',
 			domain: this.configService.get('CLIENT_HOST'),
 		})
+		res.cookie('is_signin', true, {
+			maxAge: 1000 * 60 * 60 * 24 * 60, // 30일
+			domain: this.configService.get('CLIENT_HOST'),
+		})
 		return PostAuthSignInResponse.builder()
 			.result(true)
 			.build()
@@ -61,6 +65,23 @@ export class AuthController {
 		return PostAuthSignUpResponse.builder()
 			.result(true)
 			.build()
+	}
+
+	@Post('logout')
+	@ApiOperation({ summary: '로그아웃' })
+	@CommonResponse({ type: Boolean })
+	async postLogout(@Res({ passthrough: true }) res: Response) {
+		res.cookie('is_signin', false, {
+			maxAge: 1000 * 60 * 60 * 24 * 30, // 30일
+			domain: '.codenary.co.kr',
+		})
+		res.clearCookie('auth', {
+			httpOnly: true,
+			secure: true,
+			sameSite: 'none',
+			domain: this.configService.get('CLIENT_HOST'),
+		})
+		return true
 	}
 
 	// TODO: ID 찾기
