@@ -1,6 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Expose } from 'class-transformer'
 import { PaymentMethod, PaymentStatus } from 'src/api/entities/payment.entity'
+import { EasyPayType } from './toss-payment.dto'
+
+class Receipt {
+	@ApiProperty()
+	@Expose()
+	url: string
+}
+
+class EasyPay {
+	@ApiProperty({ enum: EasyPayType })
+	@Expose()
+	provider: EasyPayType
+
+	@ApiProperty()
+	@Expose()
+	amount: number
+
+	@ApiProperty()
+	@Expose()
+	discountAmount: number
+}
 
 export class PaymentModel {
 	@Expose()
@@ -26,6 +47,14 @@ export class PaymentModel {
 	@Expose()
 	@ApiProperty()
 	totalAmount: number
+
+	@Expose()
+	@ApiProperty({ type: Receipt, nullable: true })
+	receipt: Receipt | null
+
+	@Expose()
+	@ApiProperty({ type: EasyPay, nullable: true })
+	easyPay?: EasyPay | null
 
 	@Expose()
 	@ApiProperty()
