@@ -61,10 +61,10 @@ export class YoutubeController {
 		if (!user) {
 			throw new UnauthorizedException('required login')
 		}
-		const youtubeId = await this.youtubeService.checkUsableYoutube(body.url, user.id)
+		const result = await this.youtubeService.checkUsableYoutube(body.url, user.id)
 		return PostYoutubeCheckUrlResponse.builder()
-			.youtubeId(youtubeId)
-			.timestampPoint(200)
+			.youtubeId(result?.youtubeId || null)
+			.timestampPoint(result?.point || 0)
 			.build()
 	}
 

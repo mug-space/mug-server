@@ -40,7 +40,7 @@ export class YoutubeService {
 
 	async getYoutubeSimpleList(userId: number) {
 		const youtubeList = await this.youtubeRepository.find({
-			relations: [ 'youtubeTimestamp' ],
+			relations: [ 'youtubeTimestamps' ],
 			where: { userId },
 			order: { id: 'DESC' },
 		})
@@ -81,31 +81,54 @@ export class YoutubeService {
 				const captions = await this.getCaption(videoId)
 				if (captions && captions.length) {
 					const youtubeId = await this.addYoutube(videoId, userId)
-					await this.addYoutubeInfo(youtubeId, captions)
-					return youtubeId
+					const youtubeInfo = await this.addYoutubeInfo(youtubeId, captions, videoId)
+					return { youtubeId, point: youtubeInfo.timestampPoint }
 				}
 			}
 		}
 		return null
 	}
 
-	async addYoutubeInfo(youtubeId: number, captions: Caption[]) {
-		const youtubeInfo = await this.youtubeInfoRepository.findOne({ where: { youtubeId } })
-		if (!youtubeInfo) {
-			const newYoutubeInfo = this.youtubeInfoRepository.create({ youtubeId: youtubeId, captions: captions })
-			await this.youtubeInfoRepository.save(newYoutubeInfo)
-		}
+	async addYoutubeInfo(youtubeId: number, captions: Caption[], videoId: string) {
+		// const youtubeInfo = await this.youtubeInfoRepository.findOne({ where: { youtubeId } })
+		// if (!youtubeInfo) {
+
+		// }
+		const rapidInfo = await this.getYoutubeDetailFromRapidAPI(videoId)
+		const point = rapidInfo ? this.getPoint(Number(rapidInfo.video_length)) : this.getPoint(this.getLastTime(captions))
+		const newYoutubeInfo = this.youtubeInfoRepository.create({ youtubeId: youtubeId, captions: captions, timestampPoint: point })
+		return await this.youtubeInfoRepository.save(newYoutubeInfo)
 
 	}
 
-	async addYoutube(videoId: string, userId: number) {
-		const youtube = await this.youtubeRepository.findOne({ where: { videoId, userId } })
-		if (!youtube) {
-			const newYoutube = this.youtubeRepository.create({ videoId, userId })
-			await this.youtubeRepository.save(newYoutube)
-			return newYoutube.id
+	private getLastTime(captions: Caption[]) {
+		const lastCaption = captions[captions.length - 1]
+		return Math.floor(lastCaption.offset)
+	}
+
+	private getPoint(videoTime: number) {
+		const minute = Math.floor(videoTime / 60)
+		if (minute < 10) {
+			return 200
+		} else if (minute < 20) {
+			return 400
+		} else if (minute < 30) {
+			return 600
+		} else {
+			return 800
 		}
-		return youtube.id
+	}
+
+	async addYoutube(videoId: string, userId: number) {
+		// const youtube = await this.youtubeRepository.findOne({ where: { videoId, userId } })
+		// if (!youtube) {
+
+		// }
+		// return youtube.id
+
+		const newYoutube = this.youtubeRepository.create({ videoId, userId })
+		await this.youtubeRepository.save(newYoutube)
+		return newYoutube.id
 	}
 
 	async existYoutubeTimestamp(youtubeId: number) {
@@ -257,7 +280,6 @@ export class YoutubeService {
 		  try {
 			  const response = await this.httpService.request<RapidVideoDetail>(options).toPromise()
 			  if (response) {
-				console.log(response.data)
 				return response.data
 			  }
 			  return null
