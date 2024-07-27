@@ -34,3 +34,21 @@ export class PostUserSignInRequest {
 	@IsDefined()
 	password: string
 }
+
+export class PutUserPasswordUpdateRequest {
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
+	password: string
+}
+
+export class PostUserSendPhoneCodeRequest {
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
+	phone: string
+}
+
+export class PostUserVerifyPhoneCodeRequest {
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
+	phoneCode: string
+}

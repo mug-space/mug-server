@@ -51,6 +51,20 @@ export class UserEntity {
 	})
 	point: number
 
+	@Column('varchar', {
+		nullable: true,
+		comment: '전화번호',
+		length: 256,
+	})
+	phone: string | null
+
+	@Column('varchar', {
+		nullable: true,
+		comment: '전화번호인증번호 6자리 - 인증받을 폰번호',
+		length: 30,
+	})
+	phoneCode: string | null
+
 	@CreateDateColumn({
 		transformer: new DateTransformer(),
 	})

@@ -5,6 +5,7 @@ import { UserModel } from '../dtos/models/user.model'
 import { UserRepository } from '../repositories/user.repository'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
+import { SmsService } from './sms.service'
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,46 @@ export class UserService {
 	private readonly userRepository: UserRepository
 	@Inject()
 	private readonly jwtService: JwtService
+	@Inject()
+	private readonly smsService: SmsService
+
+	async sendPhoneCode(userId: number, phone: string) {
+		const phoneCode = this.makePhoneCode()
+		const rawPhone = this.removeHyphens(phone)
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		if (user) {
+			user.phoneCode = `${phoneCode}-${rawPhone}`
+			await this.userRepository.save(user)
+			// await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
+			return true
+		}
+		return false
+	}
+
+	async verifyPhoneCode(userId: number, phoneCode: string) {
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		if (user && user.phoneCode) {
+			const phoneCodeArr = user.phoneCode.split('-')
+			if (phoneCode === phoneCodeArr[0]) {
+				user.phone = phoneCodeArr[1]
+				await this.userRepository.save(user)
+				return true
+			}
+		}
+		return false
+	}
+
+	async updatePassword(userId: number, password: string) {
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		if (!user) {
+			return false
+		}
+		const hashedPassword = await this.makePassword(password)
+		user.password = hashedPassword
+		await this.userRepository.save(user)
+		return true
+
+	}
 
 	async getUserByAccount(account: string) {
 		const user = await this.userRepository.findOne({ where: {
@@ -63,5 +104,14 @@ export class UserService {
 		}
 		return false
 	}
+
+	private makePhoneCode() {
+		return 123456
+		// return Math.floor(100000 + Math.random() * 900000)
+	}
+
+	private removeHyphens(str: string): string {
+		return str.replace(/-/g, '').trim()
+	  }
 
 }

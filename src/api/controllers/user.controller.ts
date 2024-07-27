@@ -1,11 +1,11 @@
-import { Body, Controller, Get, Inject, NotFoundException, Post, UnauthorizedException, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Inject, NotFoundException, Post, Put, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
 import {
-	GetUserMeResponse,
+	GetUserMeResponse, PostUserSendPhoneCodeRequest, PostUserVerifyPhoneCodeRequest, PutUserPasswordUpdateRequest,
 } from '../dtos/user.dto'
 import { UserEntity } from '../entities/user.entity'
 import { UserService } from '../services/user.service'
@@ -37,7 +37,38 @@ export class UserController {
 			.build()
 	}
 
-	// TODO: PASSWORD 변경
+	@Put('password')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: '로그인 유저 정보' })
+	@CommonResponse({ type: Boolean })
+	async changePassword(@CurrentUser() user: UserEntity | null, @Body() body: PutUserPasswordUpdateRequest) {
+		if (!user) {
+			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
+		}
+		return await this.userService.updatePassword(user.id, body.password)
+	}
+
+	@Post('send-phone-code')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: '전달받은 폰번호로 인증코드 발송' })
+	@CommonResponse({ type: Boolean })
+	async sendPhoneCode(@CurrentUser() user: UserEntity | null, @Body() body: PostUserSendPhoneCodeRequest) {
+		if (!user) {
+			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
+		}
+		return await this.userService.sendPhoneCode(user.id, body.phone)
+	}
+
+	@Post('verify-phone-code')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: '전달받은 폰번호로 인증코드 발송' })
+	@CommonResponse({ type: Boolean })
+	async verifyPhoneCode(@CurrentUser() user: UserEntity | null, @Body() body: PostUserVerifyPhoneCodeRequest) {
+		if (!user) {
+			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
+		}
+		return await this.userService.verifyPhoneCode(user.id, body.phoneCode)
+	}
 
 	// TODO: EMAIL 변경
 

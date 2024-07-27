@@ -55,9 +55,9 @@ export class PaymentController {
 		if (!payment) {
 			throw new BadRequestException('결제실패')
 		}
-		await this.paymentService.addPayment(payment, 2)
-		await this.pointService.incrementPoint(2, point)
-		const updatedUser = await this.userService.getUserById(2)
+		await this.paymentService.addPayment(payment, user.id)
+		await this.pointService.incrementPoint(user.id, point)
+		const updatedUser = await this.userService.getUserById(user.id)
 		if (!updatedUser) {
 			throw new NotFoundException('not found user')
 		}
