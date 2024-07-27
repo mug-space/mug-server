@@ -68,8 +68,8 @@ export class YoutubeService {
 		return plainToInstance(YoutubeModel, {
 			...youtube,
 			status: isCompleted ? YoutubeTimestampStatus.COMPLETED : YoutubeTimestampStatus.NOT_COMPLETED,
-			firstTimestamps: isCompleted ? youtube.youtubeTimestamps[0].timestamps : [],
-			secondTimestamps: isCompleted ? youtube.youtubeTimestamps[1].timestamps : [],
+			firstTimestamp: isCompleted ? this.makeYoutubeTimestampString(youtube.youtubeTimestamps[0].timestamps) : null,
+			secondTimestamp: isCompleted ? this.makeYoutubeTimestampString(youtube.youtubeTimestamps[1].timestamps) : null,
 		}, { excludeExtraneousValues: true })
 	}
 
@@ -235,7 +235,7 @@ export class YoutubeService {
 
 	private makeYoutubeTimestampString(timestamps: TimeStampModel[]) {
 		return timestamps.reduce((prev, curr) => {
-			prev = prev + `[${curr.time}] ${curr.title}\n`
+			prev = prev + `${curr.time} ${curr.title}\n`
 			return prev
 		}, '')
 	}

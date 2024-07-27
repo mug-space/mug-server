@@ -59,12 +59,12 @@ export class YoutubeModel {
 	status: YoutubeTimestampStatus
 
 	@Expose()
-	@ApiProperty()
-	firstTimestamps: YoutubeTimestampModel[]
+	@ApiProperty({ type: String, nullable: true })
+	firstTimestamp: string | null
 
 	@Expose()
-	@ApiProperty()
-	secondTimestamps: YoutubeTimestampModel[]
+	@ApiProperty({ type: String, nullable: true })
+	secondTimestamp: string | null
 
 	@Expose()
 	@ApiProperty()
