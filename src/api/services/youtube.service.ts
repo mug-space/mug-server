@@ -155,14 +155,24 @@ export class YoutubeService {
 		return youtubeTimestamp.id
 	}
 
+	async getYoutube(youtubeId: number) {
+		return this.youtubeRepository.findOne({ where: { id: youtubeId } })
+	}
+
 	async modifyYoutubeTimestampStatus(youtubeId: number, youtubeTimestampId: number, status: YoutubeTimestampStatus) {
 		const timestamp = await this.youtubeTimestampRepository.findOne({ where: {
 			youtubeId, id: youtubeTimestampId,
-		} })
+		},
+		relations: [ 'youtube', 'youtube.youtubeInfo' ],
+		},
+
+		)
 		if (timestamp) {
 			timestamp.status = status
 			await this.youtubeTimestampRepository.save(timestamp)
+			return timestamp
 		}
+		return null
 	}
 
 	async modifyYoutubeTimestampList(youtubeId: number, youtubeTimestampId: number, timestamps: YoutubeTimestampModel[]) {

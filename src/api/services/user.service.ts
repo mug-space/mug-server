@@ -6,6 +6,7 @@ import { UserRepository } from '../repositories/user.repository'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
 import { SmsService } from './sms.service'
+import { MoreThanOrEqual } from 'typeorm'
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,14 @@ export class UserService {
 	private readonly jwtService: JwtService
 	@Inject()
 	private readonly smsService: SmsService
+
+	async hasPoint(userId: number, point: number) {
+		return this.userRepository.exists({
+			where: {
+				id: userId, point: MoreThanOrEqual(point),
+			},
+		})
+	}
 
 	async sendPhoneCode(userId: number, phone: string) {
 		const phoneCode = this.makePhoneCode()

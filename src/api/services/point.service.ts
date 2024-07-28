@@ -21,9 +21,9 @@ export class PointService {
 		return pointLogs.map((pointLog) => plainToInstance(PointLogModel, pointLog, { excludeExtraneousValues: true }))
 	}
 
-	async incrementPoint(userId: number, point: number) {
+	async incrementPoint(userId: number, point: number, ignoreLog?: boolean) {
 		const result = await this.userRepository.incrementPoint(userId, point)
-		if (result) {
+		if (result && !ignoreLog) {
 			await this.pointLogRepository.savePointLog(userId, point, PointLogType.충전)
 			return true
 		}

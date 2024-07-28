@@ -13,6 +13,8 @@ import { YoutubeService } from '../services/youtube.service'
 import { UserModel } from '../dtos/models/user.model'
 import { PointService } from '../services/point.service'
 import { UserService } from '../services/user.service'
+import { Propagation, Transactional } from 'typeorm-transactional'
+import { YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
 
 @Controller('youtubes')
 @ApiTags('Youtube')
@@ -72,6 +74,7 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamp 생성' })
 	@CommonResponse({ type: PostYoutubeTimestampGenerateResponse })
 	@UseGuards(JwtAuthGuard)
+	@Transactional({ propagation: Propagation.REQUIRED })
 	async generateYoutubeTimestamp(@CurrentUser() user: UserModel | null, @Body() body: PostYoutubeTimestampGenerateRequest) {
 		if (!user) {
 			throw new UnauthorizedException('required login')
@@ -83,6 +86,10 @@ export class YoutubeController {
 		const timestampPoint = await this.youtubeService.getYoutubeTimestampPoint(body.youtubeId)
 		if (!timestampPoint) {
 			throw new NotFoundException('not found youtube info')
+		}
+		const hasPoint = await this.userService.hasPoint(user.id, timestampPoint)
+		if (!hasPoint) {
+			throw new BadRequestException('not enough point')
 		}
 		await this.pointService.decrementPoint(user.id, timestampPoint)
 		const firstTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
@@ -104,7 +111,14 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube timestamp status update (for lambda)' })
 	@CommonResponse({ type: Boolean })
 	async updateYoutubeTimestampStatus(@Param('id') id: number, @Body() body: PutYoutubeUpdateTimestampStatusRequest) {
-		await this.youtubeService.modifyYoutubeTimestampStatus(id, body.youtubeTimestampId, body.status)
+		const timestamp = await this.youtubeService.modifyYoutubeTimestampStatus(id, body.youtubeTimestampId, body.status)
+		if (timestamp && timestamp.youtube.youtubeInfo && body.status === YoutubeTimestampStatus.ERROR) {
+			const youtube = await this.youtubeService.getYoutube(id)
+			if (youtube) {
+				await this.pointService.incrementPoint(youtube.userId, timestamp.youtube.youtubeInfo.timestampPoint, true)
+			}
+
+		}
 		return true
 	}
 
