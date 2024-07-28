@@ -43,6 +43,16 @@ export class UserService {
 		return false
 	}
 
+	async updateEmail(userId: number, email: string) {
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		if (!user) {
+			return false
+		}
+		user.email = email
+		await this.userRepository.save(user)
+		return true
+	}
+
 	async updatePassword(userId: number, password: string) {
 		const user = await this.userRepository.findOne({ where: { id: userId } })
 		if (!user) {

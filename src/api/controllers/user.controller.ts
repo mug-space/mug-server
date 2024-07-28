@@ -5,7 +5,8 @@ import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
 import {
-	GetUserMeResponse, PostUserSendPhoneCodeRequest, PostUserVerifyPhoneCodeRequest, PutUserPasswordUpdateRequest,
+	GetUserMeResponse, PostUserSendPhoneCodeRequest, PostUserVerifyPhoneCodeRequest,
+	PutUserEmailUpdateRequest, PutUserPasswordUpdateRequest,
 } from '../dtos/user.dto'
 import { UserEntity } from '../entities/user.entity'
 import { UserService } from '../services/user.service'
@@ -39,13 +40,24 @@ export class UserController {
 
 	@Put('password')
 	@UseGuards(JwtAuthGuard)
-	@ApiOperation({ summary: '로그인 유저 정보' })
+	@ApiOperation({ summary: '비밀번호 변경' })
 	@CommonResponse({ type: Boolean })
 	async changePassword(@CurrentUser() user: UserEntity | null, @Body() body: PutUserPasswordUpdateRequest) {
 		if (!user) {
 			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
 		}
 		return await this.userService.updatePassword(user.id, body.password)
+	}
+
+	@Put('email')
+	@UseGuards(JwtAuthGuard)
+	@ApiOperation({ summary: '이메일 변경' })
+	@CommonResponse({ type: Boolean })
+	async changeEmail(@CurrentUser() user: UserEntity | null, @Body() body: PutUserEmailUpdateRequest) {
+		if (!user) {
+			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
+		}
+		return await this.userService.updateEmail(user.id, body.email)
 	}
 
 	@Post('send-phone-code')

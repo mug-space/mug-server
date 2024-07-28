@@ -41,6 +41,12 @@ export class PutUserPasswordUpdateRequest {
 	password: string
 }
 
+export class PutUserEmailUpdateRequest {
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
+	email: string
+}
+
 export class PostUserSendPhoneCodeRequest {
 	@ApiProperty({ type: String, nullable: false })
 	@IsDefined()
