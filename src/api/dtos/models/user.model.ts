@@ -22,4 +22,8 @@ export class UserModel {
 	@Expose()
 	@ApiProperty({ type: Number, nullable: false })
 	point: number
+
+	@Expose()
+	@ApiProperty({ type: String, nullable: true })
+	phone: string | null
 }
