@@ -52,7 +52,15 @@ export class PaymentService {
 
 	async getPaymentList(userId: number) {
 		const paymentList = await this.paymentRepository.find({ where: { userId: userId }, order: { id: 'DESC' } })
-		return plainToInstance(PaymentModel, paymentList, { excludeExtraneousValues: true })
+
+		return paymentList.map((payment) => {
+			return plainToInstance(PaymentModel, {
+				...payment,
+				receipt: payment.paymentInfo.receipt,
+				easyPay: payment.paymentInfo.easyPay,
+			}, { excludeExtraneousValues: true })
+		})
+
 	}
 
 }
