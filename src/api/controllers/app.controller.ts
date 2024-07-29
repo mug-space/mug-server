@@ -5,6 +5,7 @@ import { YoutubeService } from '../services/youtube.service'
 import { plainToInstance } from 'class-transformer'
 import { YoutubeCaptionModel } from '../dtos/models/youtube.model'
 import { EmailParams, MailService } from '../services/mail.service'
+import { YoutubeApiService } from '../services/youtubeApi.service'
 
 class YoutubeTestRequest {
 	@ApiProperty()
@@ -18,6 +19,8 @@ export class AppController {
 	private readonly youtubeService: YoutubeService
 	@Inject()
 	private readonly mailService: MailService
+	@Inject()
+	private readonly youtubeApiService: YoutubeApiService
 
 	@Get('time')
 	async time() {
@@ -60,6 +63,12 @@ export class AppController {
 	async mailTest() {
 		await this.mailService.sendUserConfirmation('kiseon1987@gmail.com', '테스트명', '테스트유튜버', '쿠폰코드')
 
+	}
+
+	@Post('youtube-email')
+	async youtubeEmail() {
+		const result = await this.youtubeApiService.getChannels()
+		return result
 	}
 
 }
