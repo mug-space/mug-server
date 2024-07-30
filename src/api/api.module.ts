@@ -20,17 +20,19 @@ import { PointService } from './services/point.service'
 import { InquiryService } from './services/inquiry.service'
 import { MailService } from './services/mail.service'
 import { SmsService } from './services/sms.service'
+import { SchemeController } from './controllers/scheme.controller'
+import { SchemeService } from './services/scheme.service'
 // import { YoutubeApiService } from './services/youtubeApi.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
-	InquiryController, PointController, YoutubeController, ProductController,
+	InquiryController, PointController, YoutubeController, ProductController, SchemeController,
 ]
 @Module({
 	imports: [ CommonModule ],
 	controllers: [ ...controllers ],
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
-		ProductService, PointService, InquiryService, MailService, SmsService,
+		ProductService, PointService, InquiryService, MailService, SmsService, SchemeService,
 		// YoutubeApiService,
 	],
 	exports: [],
