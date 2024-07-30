@@ -20,7 +20,7 @@ import { PointService } from './services/point.service'
 import { InquiryService } from './services/inquiry.service'
 import { MailService } from './services/mail.service'
 import { SmsService } from './services/sms.service'
-import { YoutubeApiService } from './services/youtubeApi.service'
+// import { YoutubeApiService } from './services/youtubeApi.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
 	InquiryController, PointController, YoutubeController, ProductController,
@@ -30,7 +30,8 @@ const controllers = [ AppController, AuthController, UserController, PaymentCont
 	controllers: [ ...controllers ],
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
-		ProductService, PointService, InquiryService, MailService, SmsService, YoutubeApiService,
+		ProductService, PointService, InquiryService, MailService, SmsService,
+		// YoutubeApiService,
 	],
 	exports: [],
 })
