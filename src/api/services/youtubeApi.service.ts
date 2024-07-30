@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { google } from 'googleapis'
 import axios from 'axios'
-import * as cheerio from 'cheerio'
 
 @Injectable()
 export class YoutubeApiService {
@@ -34,7 +33,7 @@ export class YoutubeApiService {
 			if (channel.statistics?.subscriberCount
 			// && Number(channel.statistics.subscriberCount) >= 100000
 			) {
-				const email = await this.getChannelEmail(channelId)
+				const email = null
 				const emails = !email && channel.snippet?.description ? this.extractEmails(channel.snippet.description) : []
 				if (email) {
 					emails.push(email)
@@ -95,20 +94,20 @@ export class YoutubeApiService {
 		  }
 	}
 
-	async getChannelEmail(channelId: string): Promise<string | null> {
-		const url = `https://www.youtube.com/channel/${channelId}/about`
+	// async getChannelEmail(channelId: string): Promise<string | null> {
+	// 	const url = `https://www.youtube.com/channel/${channelId}/about`
 
-		try {
-			const response = await axios.get(url)
-			const $ = cheerio.load(response.data)
-			const emailElement = $('a[href^="mailto:"]').first()
-			const email = emailElement.attr('href') ? emailElement.attr('href')!.replace('mailto:', '') : null
-			return email
-		} catch (error) {
-			console.error(`Error fetching email for channelId ${channelId}:`, error)
-			return null
-		}
-	}
+	// 	try {
+	// 		const response = await axios.get(url)
+	// 		const $ = cheerio.load(response.data)
+	// 		const emailElement = $('a[href^="mailto:"]').first()
+	// 		const email = emailElement.attr('href') ? emailElement.attr('href')!.replace('mailto:', '') : null
+	// 		return email
+	// 	} catch (error) {
+	// 		console.error(`Error fetching email for channelId ${channelId}:`, error)
+	// 		return null
+	// 	}
+	// }
 
 	private extractEmails(text: string): string[] {
 		const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b/g
