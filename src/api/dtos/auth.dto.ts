@@ -35,3 +35,16 @@ export class PostAuthSignInRequest {
 	@ApiProperty({ type: String, nullable: true })
 	password: string
 }
+
+export class PostAuthAccountExistCheckResponse {
+
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty()
+	exist: boolean
+}
+
+export class PostAuthAccountExistCheckRequest {
+	@ApiProperty({ type: String, nullable: true })
+	account: string
+}

@@ -6,7 +6,7 @@ import { UserRepository } from '../repositories/user.repository'
 import * as bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
 import { SmsService } from './sms.service'
-import { MoreThanOrEqual } from 'typeorm'
+import { IsNull, MoreThanOrEqual } from 'typeorm'
 
 @Injectable()
 export class UserService {
@@ -17,6 +17,13 @@ export class UserService {
 	private readonly jwtService: JwtService
 	@Inject()
 	private readonly smsService: SmsService
+
+	async existAccount(account: string) {
+		const exist = await this.userRepository.exists({ where: {
+			account, deletedAt: IsNull(),
+		} })
+		return exist
+	}
 
 	async hasPoint(userId: number, point: number) {
 		return this.userRepository.exists({

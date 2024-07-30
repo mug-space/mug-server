@@ -2,7 +2,8 @@ import { Body, Controller, Get, Inject, NotFoundException, Post, Res, Unauthoriz
 import { ConfigService } from '@nestjs/config'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { CommonResponse } from 'src/common/response'
-import { PostAuthSignInRequest, PostAuthSignInResponse, PostAuthSignUpRequest, PostAuthSignUpResponse } from '../dtos/auth.dto'
+import { PostAuthAccountExistCheckRequest, PostAuthAccountExistCheckResponse,
+	PostAuthSignInRequest, PostAuthSignInResponse, PostAuthSignUpRequest, PostAuthSignUpResponse } from '../dtos/auth.dto'
 import { UserService } from '../services/user.service'
 import { Response } from 'express'
 
@@ -42,6 +43,16 @@ export class AuthController {
 		})
 		return PostAuthSignInResponse.builder()
 			.result(true)
+			.build()
+	}
+
+	@Post('account-exist-check')
+	@ApiOperation({ summary: 'id 중복 체크' })
+	@CommonResponse({ type: PostAuthAccountExistCheckResponse })
+	async accountExistCheck(@Body() body: PostAuthAccountExistCheckRequest) {
+		const exist = await this.userService.existAccount(body.account)
+		return PostAuthAccountExistCheckResponse.builder()
+			.exist(exist)
 			.build()
 	}
 
