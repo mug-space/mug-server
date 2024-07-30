@@ -1,27 +1,24 @@
 // src/sms/sms.service.ts
-import { Injectable } from '@nestjs/common'
-import { PublishCommand, SNSClient } from '@aws-sdk/client-sns'
+import { Inject, Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { SolapiMessageService as msgModule } from 'solapi'
 
 @Injectable()
 export class SmsService {
-	private snsClient: SNSClient
 
-	constructor() {
-		this.snsClient = new SNSClient({ region: 'ap-northeast-2' })
-	}
+	@Inject()
+	private readonly configService: ConfigService
 
-	async sendSms(to: string, message: string): Promise<void> {
+	async sendSms(to: string, text: string) {
+		const messageService = new msgModule(this.configService.get('SOLAPI_API_KEY', ''), this.configService.get('SOLAPI_SECRET_KEY', ''))
 		const params = {
-			Message: message,
-			PhoneNumber: to,
+			text: text,
+			to: to,
+			from: '01047170851', // 발신번호 (보내는이)
 		}
+		const result = await messageService.sendOne(params)
+		console.log(result)
 
-		try {
-			const command = new PublishCommand(params)
-			await this.snsClient.send(command)
-			console.log(`Message sent to ${to}`)
-		} catch (error) {
-			console.error(`Failed to send message to ${to}`, error)
-		}
 	}
+
 }

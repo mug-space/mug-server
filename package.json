@@ -54,6 +54,7 @@
 		"rxjs": "^7.5.5",
 		"serverless": "^3.38.0",
 		"serverless-http": "^3.2.0",
+		"solapi": "^5.3.1",
 		"swagger-ui-express": "4.1.4",
 		"twilio": "^5.2.2",
 		"typeorm": "^0.3.20",

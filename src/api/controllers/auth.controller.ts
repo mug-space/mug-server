@@ -6,6 +6,7 @@ import { PostAuthAccountExistCheckRequest, PostAuthAccountExistCheckResponse,
 	PostAuthSignInRequest, PostAuthSignInResponse, PostAuthSignUpRequest, PostAuthSignUpResponse } from '../dtos/auth.dto'
 import { UserService } from '../services/user.service'
 import { Response } from 'express'
+import { BadRequestError } from 'solapi'
 
 @Controller('auths')
 @ApiTags('Auth')
@@ -60,6 +61,10 @@ export class AuthController {
 	@ApiOperation({ summary: '회원가입' })
 	@CommonResponse({ type: PostAuthSignUpResponse })
 	async postSignUp(@Body() body: PostAuthSignUpRequest, @Res({ passthrough: true }) res: Response) {
+		const exist = await this.userService.existAccount(body.account)
+		if (exist) {
+			throw new BadRequestError('이미 가입된 계정입니다.')
+		}
 		const user = await this.userService.createUser(body.account, body.email, body.password)
 		const token = await this.userService.makeToken(user)
 		res.cookie('auth', { token }, {

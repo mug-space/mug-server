@@ -10,5 +10,7 @@ export default () => {
 		RDS_HOST: 'mugspace-db.c1qo4cyyqpm3.ap-northeast-2.rds.amazonaws.com',
 		RDS_USERNAME: 'admin',
 		RDS_PASSWORD: 'mugspace1234!',
+		SOLAPI_API_KEY: 'NCSFMDBVJYOALRUK',
+		SOLAPI_SECRET_KEY: 'ABS1PQR1MBISNWMQ0WJITB9WASSURHMP',
 	}
 }

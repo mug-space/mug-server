@@ -40,7 +40,7 @@ export class UserService {
 		if (user) {
 			user.phoneCode = `${phoneCode}-${rawPhone}`
 			await this.userRepository.save(user)
-			// await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
+			await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
 			return true
 		}
 		return false
@@ -132,8 +132,8 @@ export class UserService {
 	}
 
 	private makePhoneCode() {
-		return 123456
-		// return Math.floor(100000 + Math.random() * 900000)
+		// return 123456
+		return Math.floor(100000 + Math.random() * 900000)
 	}
 
 	private removeHyphens(str: string): string {
