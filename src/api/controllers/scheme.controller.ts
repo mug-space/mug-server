@@ -20,7 +20,7 @@ export class SchemeController {
 	private readonly schemeService: SchemeService
 
 	@Get('check-device')
-	@UseGuards(DomainGuard)
+	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async checkDevice(@Req() req: Request) {
 		const userAgent = req.headers['user-agent']
@@ -28,7 +28,7 @@ export class SchemeController {
 	}
 
 	@Get('youtube/c/:path')
-	@UseGuards(DomainGuard)
+	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeChannel(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_CHANNEL)
@@ -48,7 +48,7 @@ export class SchemeController {
 	}
 
 	@Get('youtube/v/:path')
-	@UseGuards(DomainGuard)
+	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeVideo(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_VIDEO)
