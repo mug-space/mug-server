@@ -12,14 +12,14 @@ import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
 import { SchemeService, UserAgentDevice } from '../services/scheme.service'
 
-@Controller([ 'schemes', 's' ])
+@Controller()
 @ApiTags('Scheme')
 export class SchemeController {
 
 	@Inject()
 	private readonly schemeService: SchemeService
 
-	@Get('check-device')
+	@Get('s/check-device')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async checkDevice(@Req() req: Request) {
@@ -27,7 +27,7 @@ export class SchemeController {
 		return this.schemeService.detectDevice(userAgent)
 	}
 
-	@Get('youtube/c/:path')
+	@Get('s/youtube/c/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeChannel(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -48,7 +48,7 @@ export class SchemeController {
 
 	}
 
-	@Get('youtube/v/:path')
+	@Get('s/youtube/v/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeVideo(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -70,7 +70,7 @@ export class SchemeController {
 		}
 	}
 
-	@Post()
+	@Post('schemes')
 	@ApiOperation({ summary: 'scheme url 생성' })
 	@CommonResponse({ type: PostSchemeAddResponse })
 	@UseGuards(JwtAuthGuard)
@@ -84,7 +84,7 @@ export class SchemeController {
 			.build()
 	}
 
-	@Put(':id(\\d+)')
+	@Put('schemes/:id(\\d+)')
 	@ApiOperation({ summary: 'scheme url 수정' })
 	@CommonResponse({ type: PutSchemeModifyResponse })
 	@UseGuards(JwtAuthGuard)
@@ -98,7 +98,7 @@ export class SchemeController {
 			.build()
 	}
 
-	@Get()
+	@Get('schemes')
 	@ApiOperation({ summary: 'scheme url 목록' })
 	@CommonResponse({ type: GetSchemeListResponse })
 	@UseGuards(JwtAuthGuard)
@@ -109,7 +109,7 @@ export class SchemeController {
 			.build()
 	}
 
-	@Get(':id(\\d+)')
+	@Get('schemes/:id(\\d+)')
 	@ApiOperation({ summary: 'scheme url 상세' })
 	@CommonResponse({ type: GetSchemeDetailResponse })
 	@UseGuards(JwtAuthGuard)
