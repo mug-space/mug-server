@@ -44,7 +44,35 @@ export class SchemeController {
 				redirectUrl = scheme.ios
 			}
 		}
-		res.redirect(redirectUrl)
+		res.send(`
+			<!DOCTYPE html>
+			<html lang="en">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Redirect to YouTube App</title>
+				<script>
+				function redirectToYouTubeApp() {
+					// Custom URL Scheme
+					const youtubeAppURL = '${redirectUrl}';
+
+					// Attempt to open the YouTube app
+					window.location = youtubeAppURL;
+
+					// Fallback to the YouTube web page after a delay
+					setTimeout(function() {
+					window.location = "https://www.youtube.com";
+					}, 2000); // 2 seconds delay
+				}
+
+				window.onload = redirectToYouTubeApp;
+				</script>
+			</head>
+			<body>
+				<p>Redirecting to YouTube...</p>
+			</body>
+			</html>
+			`)
 	}
 
 	@Get('youtube/v/:path')
