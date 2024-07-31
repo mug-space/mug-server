@@ -7,6 +7,7 @@ import bcrypt from 'bcrypt'
 import { JwtService } from '@nestjs/jwt'
 import { SmsService } from './sms.service'
 import { IsNull, MoreThanOrEqual } from 'typeorm'
+import { AlimtalkService } from './alimtalk.service'
 
 @Injectable()
 export class UserService {
@@ -17,6 +18,8 @@ export class UserService {
 	private readonly jwtService: JwtService
 	@Inject()
 	private readonly smsService: SmsService
+	@Inject()
+	private readonly alimtalkService: AlimtalkService
 
 	async existAccount(account: string) {
 		const exist = await this.userRepository.exists({ where: {
@@ -40,6 +43,7 @@ export class UserService {
 		if (user) {
 			user.phoneCode = `${phoneCode}-${rawPhone}`
 			await this.userRepository.save(user)
+			await this.alimtalkService.sendAuthCode(phoneCode, rawPhone)
 			await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
 			return true
 		}
@@ -132,7 +136,6 @@ export class UserService {
 	}
 
 	private makePhoneCode() {
-		// return 123456
 		return Math.floor(100000 + Math.random() * 900000)
 	}
 
