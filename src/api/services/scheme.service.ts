@@ -33,6 +33,18 @@ export class SchemeService {
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
 					<title>Redirect to YouTube App</title>
+					<style>
+						body {
+							background-color: black;
+							color: white;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							height: 100vh;
+							margin: 0;
+							font-family: Arial, sans-serif;
+						}
+					</style>
 					<script>
 					function redirectToYouTubeApp() {
 						// Custom URL Scheme
@@ -51,7 +63,7 @@ export class SchemeService {
 					</script>
 				</head>
 				<body>
-					<p>Redirecting to YouTube...</p>
+					<div>Redirecting to YouTube...</div>
 				</body>
 				</html>
 				`
