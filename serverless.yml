@@ -34,7 +34,7 @@ package:
 
 provider:
   name: aws
-  architecture: arm64
+  # architecture: arm64
   runtime: nodejs20.x
   memorySize: 512
   timeout: 900
