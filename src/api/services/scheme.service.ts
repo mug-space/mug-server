@@ -78,6 +78,12 @@ export class SchemeService {
 	}
 
 	private determineUrlType(url: string): YoutubeUrlTypeResult {
+		// Channel: (https://youtube.com/@ytbeoneapp)
+		// Channel: (https://youtube.com/c/ytbeoneapp)
+		// Video: (https://youtube.com/watch?v=3xvxLBvdnKo)
+		// Short Video: (https://youtube.com/shorts/cS7s7t9JG3I)
+		// Live Video: (https://youtube.com/live/3xvxLBvdnKo)
+		// Video: (https://youtu.be/3xvxLBvdnKo)
 		const videoPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/
 		const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
 
