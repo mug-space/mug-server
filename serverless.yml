@@ -13,14 +13,14 @@ custom:
       createRoute53Record: true
       endPointType: REGIONAL
       securityPolicy: tls_1_2
-    # - domainName: s.mug-space.io
-    #   basePath: ''
-    #   certificateArn: arn:aws:acm:ap-northeast-2:381492264714:certificate/739ca4b4-1397-4989-a835-17f087f86758
-    #   certificateName: '*.mug-space.io'
-    #   stage: ${opt:stage, 'prod'}
-    #   createRoute53Record: true
-    #   endPointType: 'regional'
-    #   securityPolicy: tls_1_2
+    - domainName: s.mug-space.io
+      basePath: ''
+      certificateArn: arn:aws:acm:ap-northeast-2:381492264714:certificate/739ca4b4-1397-4989-a835-17f087f86758
+      certificateName: '*.mug-space.io'
+      stage: ${opt:stage, 'prod'}
+      createRoute53Record: true
+      endPointType: REGIONAL
+      securityPolicy: tls_1_2
 
 
 package:
