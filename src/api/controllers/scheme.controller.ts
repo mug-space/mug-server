@@ -8,7 +8,7 @@ import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
 import { SchemeService } from '../services/scheme.service'
 
-@Controller('schemes')
+@Controller([ 'schemes', 's' ])
 @ApiTags('Scheme')
 @UseGuards(JwtAuthGuard)
 export class SchemeController {
