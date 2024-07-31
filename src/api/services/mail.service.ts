@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import * as nodemailer from 'nodemailer'
+import nodemailer from 'nodemailer'
 
 export interface EmailParams {
 	to: string;
