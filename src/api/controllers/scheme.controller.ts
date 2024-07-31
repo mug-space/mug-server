@@ -1,7 +1,8 @@
 import { BadRequestException, Body, Controller, Get, Inject, NotFoundException,
 	Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Request, Response } from 'express'
+import { DomainGuard } from 'src/common/auth/domain.guard'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
@@ -19,12 +20,16 @@ export class SchemeController {
 	private readonly schemeService: SchemeService
 
 	@Get('check-device')
+	@UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
 	async checkDevice(@Req() req: Request) {
 		const userAgent = req.headers['user-agent']
 		return this.schemeService.detectDevice(userAgent)
 	}
 
 	@Get('youtube/c/:path')
+	@UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
 	async redirectYoutubeChannel(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_CHANNEL)
 		let redirectUrl = 'https://mug-space.io'
@@ -43,6 +48,8 @@ export class SchemeController {
 	}
 
 	@Get('youtube/v/:path')
+	@UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
 	async redirectYoutubeVideo(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_VIDEO)
 		let redirectUrl = 'https://mug-space.io'
