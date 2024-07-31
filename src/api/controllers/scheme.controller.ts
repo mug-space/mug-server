@@ -1,12 +1,15 @@
-import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Get, Inject, NotFoundException,
+	Param, Post, Put, Req, Res, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Request, Response } from 'express'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
+import { SchemeType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
-import { SchemeService } from '../services/scheme.service'
+import { SchemeService, UserAgentDevice } from '../services/scheme.service'
 
 @Controller([ 'schemes', 's' ])
 @ApiTags('Scheme')
@@ -16,14 +19,46 @@ export class SchemeController {
 	@Inject()
 	private readonly schemeService: SchemeService
 
-	@Get('youtube/c')
-	async redirectYoutubeChannel() {
-
+	@Get('check-device')
+	async checkDevice(@Req() req: Request) {
+		const userAgent = req.headers['user-agent']
+		return this.schemeService.detectDevice(userAgent)
 	}
 
-	@Get('youtube/v')
-	async redirectYoutubeVideo() {
+	@Get('youtube/c/:path')
+	async redirectYoutubeChannel(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_CHANNEL)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			console.log(userAgent)
+			const device = this.schemeService.detectDevice(userAgent)
+			console.log(device)
+			if (device === UserAgentDevice.Android) {
+				redirectUrl = scheme.android
+			} else {
+				redirectUrl = scheme.ios
+			}
+		}
+		res.redirect(redirectUrl)
+	}
 
+	@Get('youtube/v/:path')
+	async redirectYoutubeVideo(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_VIDEO)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			console.log(userAgent)
+			const device = this.schemeService.detectDevice(userAgent)
+			console.log(device)
+			if (device === UserAgentDevice.Android) {
+				redirectUrl = scheme.android
+			} else {
+				redirectUrl = scheme.ios
+			}
+		}
+		res.redirect(redirectUrl)
 	}
 
 	@Post()

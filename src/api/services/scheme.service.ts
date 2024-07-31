@@ -4,11 +4,41 @@ import { SchemeRepository } from '../repositories/scheme.repository'
 import { SchemeModel, SchemeType } from '../dtos/models/scheme.model'
 import { plainToInstance } from 'class-transformer'
 
+export enum UserAgentDevice {
+	Android = 'Android',
+	iOS = 'iOS',
+	Windows = 'Windows',
+	macOS = 'macOS',
+	Unknown = 'Unknown',
+}
+
 @Injectable()
 export class SchemeService {
 
 	@InjectRepository(SchemeRepository)
 	private readonly schemeRepository: SchemeRepository
+
+	async getSchemeByPathAndType(path: string, type: SchemeType) {
+		const scheme = await this.schemeRepository.findOne({
+			where: { path, type },
+		})
+		return scheme
+	}
+
+	detectDevice(userAgent: string | undefined): UserAgentDevice {
+		if (!userAgent) return UserAgentDevice.Unknown
+		if (userAgent.includes('Android')) {
+			return UserAgentDevice.Android
+		} else if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+			return UserAgentDevice.iOS
+		} else if (userAgent.includes('Windows')) {
+			return UserAgentDevice.Windows
+		} else if (userAgent.includes('Macintosh')) {
+			return UserAgentDevice.macOS
+		} else {
+			return UserAgentDevice.Unknown
+		}
+	}
 
 	async addScheme(url: string, type: SchemeType, userId: number) {
 
@@ -85,9 +115,12 @@ export class SchemeService {
 		// Live Video: (https://youtube.com/live/3xvxLBvdnKo)
 		// Video: (https://youtu.be/3xvxLBvdnKo)
 		const videoPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/
+		const shortPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/
+		const livePattern = /^(https?:\/\/)?(www\.)?youtube\.com\/live\/[\w-]+/
+		const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
 		const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
 
-		if (videoPattern.test(url)) {
+		if (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url)) {
 			return { type: 'video', url }
 		} else if (channelPattern.test(url)) {
 			return { type: 'channel', url }

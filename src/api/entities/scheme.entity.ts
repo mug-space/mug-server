@@ -1,6 +1,7 @@
 import {
 	Column,
 	CreateDateColumn,
+	DeleteDateColumn,
 	Entity,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
@@ -20,6 +21,12 @@ export class SchemeEntity {
 		comment: 'users ID',
 	})
 	userId: number
+
+	@Column('varchar', {
+		nullable: false,
+		comment: 'scheme url 맨뒤에 붙을 path',
+	})
+	path: string
 
 	@Column('varchar', {
 		nullable: false,
@@ -54,5 +61,10 @@ export class SchemeEntity {
 		transformer: new DateTransformer(),
 	})
 	updatedAt: number
+
+	@DeleteDateColumn({
+		transformer: new DateTransformer(),
+	})
+	deletedAt: number | null
 
 }

@@ -18,10 +18,6 @@ export class SchemeModel {
 
 	@Expose()
 	@ApiProperty({ type: String, nullable: false })
-	redirect: string
-
-	@Expose()
-	@ApiProperty({ type: String, nullable: false })
 	url: string
 
 	@Expose()
