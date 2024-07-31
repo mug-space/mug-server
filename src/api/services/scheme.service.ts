@@ -25,6 +25,38 @@ export class SchemeService {
 		return scheme
 	}
 
+	makeResponseHtml(redirectUrl: string, webUrl: string) {
+		return `
+				<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<title>Redirect to YouTube App</title>
+					<script>
+					function redirectToYouTubeApp() {
+						// Custom URL Scheme
+						const youtubeAppURL = '${redirectUrl}';
+
+						// Attempt to open the YouTube app
+						window.location = youtubeAppURL;
+
+						// Fallback to the YouTube web page after a delay
+						setTimeout(function() {
+						window.location = '${webUrl}';
+						}, 2000); // 2 seconds delay
+					}
+
+					window.onload = redirectToYouTubeApp;
+					</script>
+				</head>
+				<body>
+					<p>Redirecting to YouTube...</p>
+				</body>
+				</html>
+				`
+	}
+
 	detectDevice(userAgent: string | undefined): UserAgentDevice {
 		if (!userAgent) return UserAgentDevice.Unknown
 		if (userAgent.includes('Android')) {
@@ -40,15 +72,14 @@ export class SchemeService {
 		}
 	}
 
-	async addScheme(url: string, type: SchemeType, userId: number) {
-
+	async addScheme(url: string, type: SchemeType, path: string, userId: number) {
 		const determineUrl = this.determineUrlType(url)
 		if ((type === SchemeType.YOUTUBE_VIDEO && determineUrl.type === 'video') ||
 		(type === SchemeType.YOUTUBE_CHANNEL && determineUrl.type === 'channel')
 		) {
 			const urlData = this.makeUrl(url)
 			const scheme = this.schemeRepository.create({
-				url, userId, type, android: urlData.android, ios: urlData.ios,
+				path, url, userId, type, android: urlData.android, ios: urlData.ios,
 			})
 			await this.schemeRepository.save(scheme)
 			return plainToInstance(SchemeModel, scheme, { excludeExtraneousValues: true })
@@ -102,8 +133,18 @@ export class SchemeService {
 
 	private makeUrl(url: string) {
 		return {
-			android: `youtube://${url}`,
-			ios: url,
+			android: this.generateAndroidIntent(url),
+			ios: `youtube://${url.replace('https://', '')}`,
+		}
+	}
+
+	private generateAndroidIntent(baseUrl: string): string {
+		if (baseUrl.includes('youtube.com')) {
+			return `intent://${baseUrl.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
+		} else if (baseUrl.includes('youtu.be')) {
+			return `intent://${baseUrl.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
+		} else {
+			return baseUrl
 		}
 	}
 

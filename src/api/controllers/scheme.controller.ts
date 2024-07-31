@@ -35,43 +35,13 @@ export class SchemeController {
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
 			const userAgent = req.headers['user-agent']
-			console.log(userAgent)
 			const device = this.schemeService.detectDevice(userAgent)
-			console.log(device)
 			if (device === UserAgentDevice.Android) {
 				redirectUrl = scheme.android
 			} else {
 				redirectUrl = scheme.ios
 			}
-			res.send(`
-				<!DOCTYPE html>
-				<html lang="en">
-				<head>
-					<meta charset="UTF-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1.0">
-					<title>Redirect to YouTube App</title>
-					<script>
-					function redirectToYouTubeApp() {
-						// Custom URL Scheme
-						const youtubeAppURL = '${redirectUrl}';
-
-						// Attempt to open the YouTube app
-						window.location = youtubeAppURL;
-
-						// Fallback to the YouTube web page after a delay
-						setTimeout(function() {
-						window.location = "${scheme.url}";
-						}, 2000); // 2 seconds delay
-					}
-
-					window.onload = redirectToYouTubeApp;
-					</script>
-				</head>
-				<body>
-					<p>Redirecting to YouTube...</p>
-				</body>
-				</html>
-				`)
+			res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -86,16 +56,18 @@ export class SchemeController {
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
 			const userAgent = req.headers['user-agent']
-			console.log(userAgent)
 			const device = this.schemeService.detectDevice(userAgent)
-			console.log(device)
 			if (device === UserAgentDevice.Android) {
 				redirectUrl = scheme.android
-			} else {
+			} else if (device === UserAgentDevice.iOS) {
 				redirectUrl = scheme.ios
+			} else {
+				redirectUrl = scheme.url
 			}
+			res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
+		} else {
+			res.redirect('https://mug-space.io')
 		}
-		res.redirect(redirectUrl)
 	}
 
 	@Post()
@@ -103,7 +75,7 @@ export class SchemeController {
 	@CommonResponse({ type: PostSchemeAddResponse })
 	@UseGuards(JwtAuthGuard)
 	async addSchemeUrl(@Body() body: PostSchemeAddRequest, @CurrentUser() user: UserModel) {
-		const scheme = await this.schemeService.addScheme(body.url, body.type, user.id)
+		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id)
 		if (!scheme) {
 			throw new BadRequestException('잘못된 URL 입니다.')
 		}

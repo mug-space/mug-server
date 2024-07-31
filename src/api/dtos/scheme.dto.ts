@@ -11,6 +11,10 @@ export class PostSchemeAddRequest {
 	@ApiProperty({ enum: SchemeType })
 	@IsEnum(SchemeType)
 	type: SchemeType
+
+	@ApiProperty()
+	@IsDefined()
+	path: string
 }
 
 export class PostSchemeAddResponse {
