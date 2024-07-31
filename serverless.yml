@@ -64,6 +64,11 @@ provider:
             - "s3:DeleteObject"
             - lambda:InvokeFunction
           Resource: "*"
+        - Effect: "Allow"
+          Action:
+            - "acm:ListCertificates"
+            - "acm:DescribeCertificate"
+          Resource: "*"
   apiGateway:
     binaryMediaTypes:
       - '*/*'
