@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
+import { randomUUID } from 'crypto'
 
 @Injectable()
 export class AlimtalkService {
@@ -12,14 +13,16 @@ export class AlimtalkService {
 	}
 
 	private async sendAlimtalk(phone: string, templateCode: string, parameter: Record<string, string>) {
+		const appkey = 'vAaCzpn7dZbYj6cp'
+		const url = 'https://api-alimtalk.cloud.toast.com' + `/alimtalk/v2.3/appkeys/${appkey}/messages`
 		const body = {
-			'senderKey': '',
+			'senderKey': randomUUID(),
 			'templateCode': templateCode,
 			'recipientList': [{ 'recipientNo': phone, 'templateParameter': parameter }] }
-		const result = await this.httpService.post<AlimtalkResponse>('https://api-alimtalk.cloud.toast.com', body, {
+		const result = await this.httpService.post<AlimtalkResponse>(url, body, {
 			headers: {
 				'Content-Type': 'application/json;charset=UTF-8',
-				'X-Secret-Key': '',
+				'X-Secret-Key': 'ZTCJBhHdYAJkOSqPTpESjyghRpVzKxMT',
 			},
 		}).toPromise()
 		console.info(result)
