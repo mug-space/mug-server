@@ -45,7 +45,7 @@ jobs:
         run: yarn install --production=false
       - name: Build
         run: yarn build
-      - name: Deploy Serverless
-        run: npx sls deploy --stage prod
       - name: Deploy Domin
         run: npx sls create_domain --stage prod
+      - name: Deploy Serverless
+        run: npx sls deploy --stage prod
