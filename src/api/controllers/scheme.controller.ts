@@ -13,7 +13,6 @@ import { SchemeService, UserAgentDevice } from '../services/scheme.service'
 
 @Controller([ 'schemes', 's' ])
 @ApiTags('Scheme')
-@UseGuards(JwtAuthGuard)
 export class SchemeController {
 
 	@Inject()
@@ -64,6 +63,7 @@ export class SchemeController {
 	@Post()
 	@ApiOperation({ summary: 'scheme url 생성' })
 	@CommonResponse({ type: PostSchemeAddResponse })
+	@UseGuards(JwtAuthGuard)
 	async addSchemeUrl(@Body() body: PostSchemeAddRequest, @CurrentUser() user: UserModel) {
 		const scheme = await this.schemeService.addScheme(body.url, body.type, user.id)
 		if (!scheme) {
@@ -77,6 +77,7 @@ export class SchemeController {
 	@Put(':id(\\d+)')
 	@ApiOperation({ summary: 'scheme url 수정' })
 	@CommonResponse({ type: PutSchemeModifyResponse })
+	@UseGuards(JwtAuthGuard)
 	async updateSchemeUrl(@Param('id') id: number, @Body() body: PutSchemeModifyRequest, @CurrentUser() user: UserModel) {
 		const scheme = await this.schemeService.updateScheme(id, body.url, user.id)
 		if (!scheme) {
@@ -90,6 +91,7 @@ export class SchemeController {
 	@Get()
 	@ApiOperation({ summary: 'scheme url 목록' })
 	@CommonResponse({ type: GetSchemeListResponse })
+	@UseGuards(JwtAuthGuard)
 	async getSchemeList(@CurrentUser() user: UserModel) {
 		const list = await this.schemeService.getSchemeList(user.id)
 		return GetSchemeListResponse.builder()
@@ -100,6 +102,7 @@ export class SchemeController {
 	@Get(':id(\\d+)')
 	@ApiOperation({ summary: 'scheme url 상세' })
 	@CommonResponse({ type: GetSchemeDetailResponse })
+	@UseGuards(JwtAuthGuard)
 	async getSchemeDetail(@CurrentUser() user: UserModel, @Param('id') id: number) {
 		const scheme = await this.schemeService.getSchemeDetail(id, user.id)
 		if (!scheme) {
