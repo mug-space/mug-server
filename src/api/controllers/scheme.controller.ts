@@ -16,6 +16,16 @@ export class SchemeController {
 	@Inject()
 	private readonly schemeService: SchemeService
 
+	@Get('youtube/c')
+	async redirectYoutubeChannel() {
+
+	}
+
+	@Get('youtube/v')
+	async redirectYoutubeVideo() {
+
+	}
+
 	@Post()
 	@ApiOperation({ summary: 'scheme url 생성' })
 	@CommonResponse({ type: PostSchemeAddResponse })
