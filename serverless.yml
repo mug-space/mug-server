@@ -4,14 +4,21 @@ plugins:
   - serverless-domain-manager
 
 custom:
-  customDomain:
-    domainName: api.mug-space.io
-    basePath: ''
-    certificateName: '*.mug-space.io'
-    stage: ${opt:stage, 'prod'}
-    createRoute53Record: true
-    endPointType: 'regional'
-    securityPolicy: tls_1_2
+  customDomains:
+    - domainName: api.mug-space.io
+      basePath: ''
+      certificateName: '*.mug-space.io'
+      stage: ${opt:stage, 'prod'}
+      createRoute53Record: true
+      endPointType: 'regional'
+      securityPolicy: tls_1_2
+    - domainName: s.mug-space.io
+      basePath: ''
+      certificateName: '*.mug-space.io'
+      stage: ${opt:stage, 'prod'}
+      createRoute53Record: true
+      endPointType: 'regional'
+      securityPolicy: tls_1_2
 
 
 package:
@@ -25,7 +32,7 @@ package:
 
 provider:
   name: aws
-  # architecture: arm64
+  architecture: arm64
   runtime: nodejs20.x
   memorySize: 512
   timeout: 900
