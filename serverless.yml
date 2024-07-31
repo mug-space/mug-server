@@ -11,7 +11,7 @@ custom:
       certificateName: '*.mug-space.io'
       stage: ${opt:stage, 'prod'}
       createRoute53Record: true
-      endPointType: 'regional'
+      endPointType: REGIONAL
       securityPolicy: tls_1_2
     # - domainName: s.mug-space.io
     #   basePath: ''
