@@ -9,7 +9,12 @@ export class AlimtalkService {
 	private readonly httpService: HttpService
 
 	async sendAuthCode(code: number, phone: string) {
-		await this.sendAlimtalk(phone, 'PHONE_AUTH_CODE', { code: code.toString() })
+		try {
+			await this.sendAlimtalk(phone, 'PHONE_AUTH_CODE', { code: code.toString() })
+		} catch (error) {
+			console.error(error)
+		}
+
 	}
 
 	private async sendAlimtalk(phone: string, templateCode: string, parameter: Record<string, string>) {
