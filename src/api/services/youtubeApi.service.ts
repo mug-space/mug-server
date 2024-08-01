@@ -1,12 +1,15 @@
-// import { Injectable } from '@nestjs/common'
+// import { Inject, Injectable } from '@nestjs/common'
 // import { google } from 'googleapis'
 // import axios from 'axios'
+// import { ConfigService } from '@nestjs/config'
 
 // @Injectable()
 // export class YoutubeApiService {
 // 	private readonly youtube = google.youtube('v3')
-// 	private readonly API_KEY = 'AIzaSyAxBPz__RwVzniGkG1mQeXIdTe70GtTQQo'
 // 	private readonly MAX_RESULTS = 10
+
+// 	@Inject()
+// 	private readonly configService: ConfigService
 
 // 	async getChannels() {
 // 		const channelNames = [ 'askmeanything_heayun' ]
@@ -23,8 +26,9 @@
 // 	}
 
 // 	async getChannelDetails(channelId: string) {
+// 		const apiKey = this.configService.get('YOUTUBE_API_KEY')
 // 		const response = await this.youtube.channels.list({
-// 			key: this.API_KEY,
+// 			key: apiKey,
 // 			part: [ 'snippet', 'statistics' ],
 // 			id: [ channelId ],
 // 		})
@@ -58,7 +62,7 @@
 // 			  channel_name: channelName,
 // 			},
 // 			headers: {
-// 			  'x-rapidapi-key': '2817c39907msh6724e064079b7a2p186d24jsn076d1c7e2627',
+// 			  'x-rapidapi-key': this.configService.get('RAPID_API_KEY'),
 // 			  'x-rapidapi-host': 'youtube-v2.p.rapidapi.com',
 // 			},
 // 		  }
@@ -80,7 +84,7 @@
 // 			  channel_id: channelId,
 // 			},
 // 			headers: {
-// 			  'x-rapidapi-key': '2817c39907msh6724e064079b7a2p186d24jsn076d1c7e2627',
+// 			  'x-rapidapi-key': this.configService.get('RAPID_API_KEY'),
 // 			  'x-rapidapi-host': 'youtube-v2.p.rapidapi.com',
 // 			},
 // 		  }

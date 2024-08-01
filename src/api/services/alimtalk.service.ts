@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { HttpService } from '@nestjs/axios'
 import { randomUUID } from 'crypto'
+import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class AlimtalkService {
 
 	@Inject()
 	private readonly httpService: HttpService
+	@Inject()
+	private readonly configService: ConfigService
 
 	async sendAuthCode(code: number, phone: string) {
 		try {
@@ -18,7 +21,7 @@ export class AlimtalkService {
 	}
 
 	private async sendAlimtalk(phone: string, templateCode: string, parameter: Record<string, string>) {
-		const appkey = 'vAaCzpn7dZbYj6cp'
+		const appkey = this.configService.get('KAKAO_APPKEY')
 		const url = 'https://api-alimtalk.cloud.toast.com' + `/alimtalk/v2.3/appkeys/${appkey}/messages`
 		const body = {
 			'senderKey': randomUUID(),
@@ -27,7 +30,7 @@ export class AlimtalkService {
 		const result = await this.httpService.post<AlimtalkResponse>(url, body, {
 			headers: {
 				'Content-Type': 'application/json;charset=UTF-8',
-				'X-Secret-Key': 'ZTCJBhHdYAJkOSqPTpESjyghRpVzKxMT',
+				'X-Secret-Key': this.configService.get('KAKAO_SECRET_KEY', ''),
 			},
 		}).toPromise()
 		console.info(result)
