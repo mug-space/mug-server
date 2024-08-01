@@ -43,8 +43,10 @@ export class UserService {
 		if (user) {
 			user.phoneCode = `${phoneCode}-${rawPhone}`
 			await this.userRepository.save(user)
-			await this.alimtalkService.sendAuthCode(phoneCode, rawPhone)
-			await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
+			const sendResult = await this.alimtalkService.sendAuthCode(phoneCode, rawPhone)
+			if (!sendResult) {
+				await this.smsService.sendSms(rawPhone, `인증번호는\n[${phoneCode}] 입니다.`)
+			}
 			return true
 		}
 		return false
