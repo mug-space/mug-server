@@ -25,6 +25,6 @@ export class SchemeModel {
 	customUrl: string
 
 	@Expose()
-	@ApiProperty({ description: 'custom url 뒤에 붙을 path' })
+	@ApiProperty({ description: 'custom url 뒤에 붙을 입력받은 path' })
 	path: string
 }
