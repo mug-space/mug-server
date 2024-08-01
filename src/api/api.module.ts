@@ -22,6 +22,7 @@ import { MailService } from './services/mail.service'
 import { SmsService } from './services/sms.service'
 import { SchemeController } from './controllers/scheme.controller'
 import { SchemeService } from './services/scheme.service'
+import { AlimtalkService } from './services/alimtalk.service'
 // import { YoutubeApiService } from './services/youtubeApi.service'
 
 const controllers = [ AppController, AuthController, UserController, PaymentController, CouponController,
@@ -33,6 +34,7 @@ const controllers = [ AppController, AuthController, UserController, PaymentCont
 	providers: [
 		JwtStrategy, UserService, YoutubeService, PaymentService, CouponService,
 		ProductService, PointService, InquiryService, MailService, SmsService, SchemeService,
+		AlimtalkService,
 		// YoutubeApiService,
 	],
 	exports: [],
