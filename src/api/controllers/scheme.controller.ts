@@ -37,9 +37,11 @@ export class SchemeController {
 			const userAgent = req.headers['user-agent']
 			const device = this.schemeService.detectDevice(userAgent)
 			if (device === UserAgentDevice.Android) {
-				redirectUrl = scheme.android
+				redirectUrl = this.schemeService.makeAndroidSchemeUrl(scheme.url)
+			} else if (device === UserAgentDevice.iOS) {
+				redirectUrl = this.schemeService.makeIOSSchemeUrl(scheme.url)
 			} else {
-				redirectUrl = scheme.ios
+				redirectUrl = scheme.url
 			}
 			res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 		} else {
@@ -58,9 +60,9 @@ export class SchemeController {
 			const userAgent = req.headers['user-agent']
 			const device = this.schemeService.detectDevice(userAgent)
 			if (device === UserAgentDevice.Android) {
-				redirectUrl = scheme.android
+				redirectUrl = this.schemeService.makeAndroidSchemeUrl(scheme.url)
 			} else if (device === UserAgentDevice.iOS) {
-				redirectUrl = scheme.ios
+				redirectUrl = this.schemeService.makeIOSSchemeUrl(scheme.url)
 			} else {
 				redirectUrl = scheme.url
 			}
@@ -75,6 +77,10 @@ export class SchemeController {
 	@CommonResponse({ type: PostSchemeAddResponse })
 	@UseGuards(JwtAuthGuard)
 	async addSchemeUrl(@Body() body: PostSchemeAddRequest, @CurrentUser() user: UserModel) {
+		const isValidUrl = this.schemeService.validUrl(body.type, body.url)
+		if (!isValidUrl) {
+			throw new BadRequestException('잘못된 URL 입니다.')
+		}
 		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id)
 		if (!scheme) {
 			throw new BadRequestException('잘못된 URL 입니다.')

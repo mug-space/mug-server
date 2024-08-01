@@ -40,18 +40,6 @@ export class SchemeEntity {
 	})
 	url: string
 
-	@Column('varchar', {
-		nullable: false,
-		comment: 'ios, web url',
-	})
-	ios: string
-
-	@Column('varchar', {
-		nullable: false,
-		comment: 'anroid',
-	})
-	android: string
-
 	@CreateDateColumn({
 		transformer: new DateTransformer(),
 	})

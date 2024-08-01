@@ -12,6 +12,12 @@ export enum UserAgentDevice {
 	Unknown = 'Unknown',
 }
 
+const videoPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/
+const shortPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/
+const livePattern = /^(https?:\/\/)?(www\.)?youtube\.com\/live\/[\w-]+/
+const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
+const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
+
 @Injectable()
 export class SchemeService {
 
@@ -85,19 +91,26 @@ export class SchemeService {
 	}
 
 	async addScheme(url: string, type: SchemeType, path: string, userId: number) {
-		const determineUrl = this.determineUrlType(url)
-		if ((type === SchemeType.YOUTUBE_VIDEO && determineUrl.type === 'video') ||
-		(type === SchemeType.YOUTUBE_CHANNEL && determineUrl.type === 'channel')
-		) {
-			const urlData = this.makeUrl(url)
-			const scheme = this.schemeRepository.create({
-				path, url, userId, type, android: urlData.android, ios: urlData.ios,
-			})
-			await this.schemeRepository.save(scheme)
-			return plainToInstance(SchemeModel, scheme, { excludeExtraneousValues: true })
-		}
+		const scheme = this.schemeRepository.create({
+			path, url, userId, type,
+		})
+		await this.schemeRepository.save(scheme)
+		const customUrl = this.makeCusotmUrl(type, path)
+		return plainToInstance(SchemeModel, {
+			...scheme,
+			customUrl,
+		}, { excludeExtraneousValues: true })
+	}
 
-		return null
+	private makeCusotmUrl(type: SchemeType, path: string) {
+		switch (type) {
+			case SchemeType.YOUTUBE_CHANNEL:
+				return `https://s.mug-space.io/s/youtube/c/${path}`
+			case SchemeType.YOUTUBE_VIDEO:
+				return `https://s.mug-space.io/s/youtube/v/${path}`
+			default:
+				return ''
+		}
 	}
 
 	async updateScheme(id: number, url: string, userId: number) {
@@ -106,17 +119,10 @@ export class SchemeService {
 		} })
 		if (scheme) {
 			if (scheme.userId === userId) {
-				const determineUrl = this.determineUrlType(url)
-				if ((scheme.type === SchemeType.YOUTUBE_VIDEO && determineUrl.type === 'video') ||
-		(scheme.type === SchemeType.YOUTUBE_CHANNEL && determineUrl.type === 'channel')
-				) {
-					const urlData = this.makeUrl(url)
-					scheme.url = url
-					scheme.android = urlData.android
-					scheme.ios = urlData.ios
-					await this.schemeRepository.save(scheme)
-					return plainToInstance(SchemeModel, scheme, { excludeExtraneousValues: true })
-				}
+				scheme.url = url
+				await this.schemeRepository.save(scheme)
+				const customUrl = this.makeCusotmUrl(scheme.type, scheme.path)
+				return plainToInstance(SchemeModel, { ...scheme, customUrl }, { excludeExtraneousValues: true })
 
 			}
 		}
@@ -127,7 +133,13 @@ export class SchemeService {
 		const list = await this.schemeRepository.find({ where: {
 			userId,
 		} })
-		return plainToInstance(SchemeModel, list, { excludeExtraneousValues: true })
+		return list.map((scheme) => {
+			return plainToInstance(SchemeModel, {
+				...scheme,
+				customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
+			}, { excludeExtraneousValues: true })
+		})
+
 	}
 
 	async getSchemeDetail(id: number, userId: number) {
@@ -137,27 +149,35 @@ export class SchemeService {
 			},
 		})
 		if (scheme) {
-			return plainToInstance(SchemeModel, scheme, { excludeExtraneousValues: true })
+			return plainToInstance(SchemeModel, {
+				...scheme,
+				customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
+			}, { excludeExtraneousValues: true })
 		}
 		return null
-
 	}
 
-	private makeUrl(url: string) {
-		return {
-			android: this.generateAndroidIntent(url),
-			ios: `youtube://${url.replace('https://', '')}`,
-		}
-	}
-
-	private generateAndroidIntent(baseUrl: string): string {
-		if (baseUrl.includes('youtube.com')) {
-			return `intent://${baseUrl.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
-		} else if (baseUrl.includes('youtu.be')) {
-			return `intent://${baseUrl.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
+	makeAndroidSchemeUrl(url: string) {
+		if (url.includes('youtube.com')) {
+			return `intent://${url.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
+		} else if (url.includes('youtu.be')) {
+			return `intent://${url.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
 		} else {
-			return baseUrl
+			return url
 		}
+	}
+
+	makeIOSSchemeUrl(url: string) {
+		return `youtube://${url.replace('https://', '')}`
+	}
+
+	validUrl(type: SchemeType, url: string) {
+		if (type === SchemeType.YOUTUBE_CHANNEL) {
+			return channelPattern.test(url)
+		} else if (type === SchemeType.YOUTUBE_VIDEO) {
+			return (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url))
+		}
+		return false
 	}
 
 	private determineUrlType(url: string): YoutubeUrlTypeResult {
@@ -167,11 +187,6 @@ export class SchemeService {
 		// Short Video: (https://youtube.com/shorts/cS7s7t9JG3I)
 		// Live Video: (https://youtube.com/live/3xvxLBvdnKo)
 		// Video: (https://youtu.be/3xvxLBvdnKo)
-		const videoPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/
-		const shortPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/
-		const livePattern = /^(https?:\/\/)?(www\.)?youtube\.com\/live\/[\w-]+/
-		const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
-		const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
 
 		if (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url)) {
 			return { type: 'video', url }
@@ -182,7 +197,7 @@ export class SchemeService {
 		}
 	}
 
-	private generateInstagramUrls(url: string): InstagramUrlTypeResult {
+	private makeInstagramUrls(url: string): InstagramUrlTypeResult {
 		const profilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
 		const postPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
 

@@ -17,14 +17,14 @@ export class SchemeModel {
 	type: SchemeType
 
 	@Expose()
-	@ApiProperty({ type: String, nullable: false })
+	@ApiProperty({ type: String, nullable: false, description: '이동할 web url' })
 	url: string
 
 	@Expose()
-	@ApiProperty({ type: Number, nullable: false })
-	ios: string
+	@ApiProperty({ type: String, nullable: false, description: '유저가 사용할 custom url' })
+	customUrl: string
 
 	@Expose()
-	@ApiProperty({ type: String, nullable: false })
-	android: string
+	@ApiProperty({ description: 'custom url 뒤에 붙을 path' })
+	path: string
 }
