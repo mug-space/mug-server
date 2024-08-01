@@ -72,6 +72,48 @@ export class SchemeController {
 		}
 	}
 
+	@Get('s/instagram/u/:path')
+	// @UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
+	async redirectInstagramProfile(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.INSTAGRAM_PROFILE)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			const device = this.schemeService.detectDevice(userAgent)
+			const urls = this.schemeService.makeInstagramProfileUrl(scheme.url)
+			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+				redirectUrl = urls.mobileUrl
+			} else {
+				redirectUrl = urls.webUrl
+			}
+			res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
+		} else {
+			res.redirect('https://mug-space.io')
+		}
+	}
+
+	@Get('s/instagram/p/:path')
+	// @UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
+	async redirectInstagramPost(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.INSTAGRAM_POST)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			const device = this.schemeService.detectDevice(userAgent)
+			const urls = this.schemeService.makeInstagramPostUrls(scheme.url)
+			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+				redirectUrl = urls.mobileUrl
+			} else {
+				redirectUrl = urls.webUrl
+			}
+			res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
+		} else {
+			res.redirect('https://mug-space.io')
+		}
+	}
+
 	@Post('schemes')
 	@ApiOperation({ summary: 'scheme url 생성' })
 	@CommonResponse({ type: PostSchemeAddResponse })

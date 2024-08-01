@@ -4,6 +4,8 @@ import { Expose } from 'class-transformer'
 export enum SchemeType {
 	YOUTUBE_CHANNEL = 'YOUTUBE_CHANNEL',
 	YOUTUBE_VIDEO = 'YOUTUBE_VIDEO',
+	INSTAGRAM_PROFILE = 'INSTAGRAM_PROFILE',
+	INSTAGRAM_POST = 'INSTAGRAM_POST',
 }
 
 export class SchemeModel {

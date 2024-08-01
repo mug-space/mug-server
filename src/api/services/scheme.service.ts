@@ -12,11 +12,19 @@ export enum UserAgentDevice {
 	Unknown = 'Unknown',
 }
 
+// Channel: (https://youtube.com/@ytbeoneapp)
+// Channel: (https://youtube.com/c/ytbeoneapp)
+// Video: (https://youtube.com/watch?v=3xvxLBvdnKo)
+// Short Video: (https://youtube.com/shorts/cS7s7t9JG3I)
+// Live Video: (https://youtube.com/live/3xvxLBvdnKo)
+// Video: (https://youtu.be/3xvxLBvdnKo)
 const videoPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/
 const shortPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/
 const livePattern = /^(https?:\/\/)?(www\.)?youtube\.com\/live\/[\w-]+/
 const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
 const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
+const profilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
+const postPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
 
 @Injectable()
 export class SchemeService {
@@ -29,50 +37,6 @@ export class SchemeService {
 			where: { path, type },
 		})
 		return scheme
-	}
-
-	makeResponseHtml(redirectUrl: string, webUrl: string) {
-		return `
-				<!DOCTYPE html>
-				<html lang="en">
-				<head>
-					<meta charset="UTF-8">
-					<meta name="viewport" content="width=device-width, initial-scale=1.0">
-					<title>Redirect to YouTube App</title>
-					<style>
-						body {
-							background-color: black;
-							color: white;
-							display: flex;
-							justify-content: center;
-							align-items: center;
-							height: 100vh;
-							margin: 0;
-							font-family: Arial, sans-serif;
-						}
-					</style>
-					<script>
-					function redirectToYouTubeApp() {
-						// Custom URL Scheme
-						const youtubeAppURL = '${redirectUrl}';
-
-						// Attempt to open the YouTube app
-						window.location = youtubeAppURL;
-
-						// Fallback to the YouTube web page after a delay
-						setTimeout(function() {
-						window.location = '${webUrl}';
-						}, 2000); // 2 seconds delay
-					}
-
-					window.onload = redirectToYouTubeApp;
-					</script>
-				</head>
-				<body>
-					<div>Redirecting to YouTube...</div>
-				</body>
-				</html>
-				`
 	}
 
 	detectDevice(userAgent: string | undefined): UserAgentDevice {
@@ -108,6 +72,10 @@ export class SchemeService {
 				return `https://s.mug-space.io/s/youtube/c/${path}`
 			case SchemeType.YOUTUBE_VIDEO:
 				return `https://s.mug-space.io/s/youtube/v/${path}`
+			case SchemeType.INSTAGRAM_PROFILE:
+				return `https://s.mug-space.io/s/instagram/u/${path}`
+			case SchemeType.INSTAGRAM_POST:
+				return `https://s.mug-space.io/s/instagram/p/${path}`
 			default:
 				return ''
 		}
@@ -180,61 +148,129 @@ export class SchemeService {
 		return false
 	}
 
-	private determineUrlType(url: string): YoutubeUrlTypeResult {
-		// Channel: (https://youtube.com/@ytbeoneapp)
-		// Channel: (https://youtube.com/c/ytbeoneapp)
-		// Video: (https://youtube.com/watch?v=3xvxLBvdnKo)
-		// Short Video: (https://youtube.com/shorts/cS7s7t9JG3I)
-		// Live Video: (https://youtube.com/live/3xvxLBvdnKo)
-		// Video: (https://youtu.be/3xvxLBvdnKo)
-
-		if (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url)) {
-			return { type: 'video', url }
-		} else if (channelPattern.test(url)) {
-			return { type: 'channel', url }
-		} else {
-			return { type: 'unknown', url }
-		}
-	}
-
-	private makeInstagramUrls(url: string): InstagramUrlTypeResult {
-		const profilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
-		const postPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
-
+	makeInstagramProfileUrl(url: string): InstagramUrlTypeResult {
 		if (profilePattern.test(url)) {
 			const matches = url.match(profilePattern)
 			const username = matches ? matches[3] : ''
 			return {
-				type: 'profile',
 				webUrl: `https://www.instagram.com/${username}`,
 				mobileUrl: `instagram://user?username=${username}`,
 			}
-		} else if (postPattern.test(url)) {
-			const matches = url.match(postPattern)
-			const postId = matches ? matches[3] : ''
-			return {
-				type: 'post',
-				webUrl: `https://www.instagram.com/p/${postId}`,
-				mobileUrl: `instagram://media?id=${postId}`,
-			}
 		} else {
 			return {
-				type: 'unknown',
 				webUrl: url,
 				mobileUrl: url,
 			}
 		}
 	}
 
-}
+	makeInstagramPostUrls(url: string): InstagramUrlTypeResult {
+		if (postPattern.test(url)) {
+			const matches = url.match(postPattern)
+			const postId = matches ? matches[3] : ''
+			return {
+				webUrl: `https://www.instagram.com/p/${postId}`,
+				mobileUrl: `instagram://media?id=${postId}`,
+			}
+		} else {
+			return {
+				webUrl: url,
+				mobileUrl: url,
+			}
+		}
+	}
 
-interface YoutubeUrlTypeResult {
-	type: 'video' | 'channel' | 'unknown';
-	url: string;
+	makeResponseHtml(redirectUrl: string, webUrl: string) {
+		return `
+				<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<title>Redirect to YouTube App</title>
+					<style>
+						body {
+							background-color: black;
+							color: white;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							height: 100vh;
+							margin: 0;
+							font-family: Arial, sans-serif;
+						}
+					</style>
+					<script>
+					function redirectToYouTubeApp() {
+						// Custom URL Scheme
+						const youtubeAppURL = '${redirectUrl}';
+
+						// Attempt to open the YouTube app
+						window.location = youtubeAppURL;
+
+						// Fallback to the YouTube web page after a delay
+						setTimeout(function() {
+						window.location = '${webUrl}';
+						}, 2000); // 2 seconds delay
+					}
+
+					window.onload = redirectToYouTubeApp;
+					</script>
+				</head>
+				<body>
+					<div>Redirecting to YouTube...</div>
+				</body>
+				</html>
+				`
+	}
+
+	makeInstagramResponseHtml(redirectUrl: string, webUrl: string) {
+		return `
+				<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<title>Redirect to Instagram App</title>
+					<style>
+						body {
+							background-color: black;
+							color: white;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							height: 100vh;
+							margin: 0;
+							font-family: Arial, sans-serif;
+						}
+					</style>
+					<script>
+					function redirectToYouTubeApp() {
+						// Custom URL Scheme
+						const youtubeAppURL = '${redirectUrl}';
+
+						// Attempt to open the YouTube app
+						window.location = youtubeAppURL;
+
+						// Fallback to the YouTube web page after a delay
+						setTimeout(function() {
+						window.location = '${webUrl}';
+						}, 2000); // 2 seconds delay
+					}
+
+					window.onload = redirectToYouTubeApp;
+					</script>
+				</head>
+				<body>
+					<div>Redirecting to Instagram...</div>
+				</body>
+				</html>
+				`
+	}
+
 }
 
 interface InstagramUrlTypeResult {
-	type: 'profile' | 'post' | 'unknown';
 	webUrl: string;
 	mobileUrl: string;
 }
