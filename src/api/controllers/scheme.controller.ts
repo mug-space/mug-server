@@ -137,12 +137,20 @@ export class SchemeController {
 	@CommonResponse({ type: PutSchemeModifyResponse })
 	@UseGuards(JwtAuthGuard)
 	async updateSchemeUrl(@Param('id') id: number, @Body() body: PutSchemeModifyRequest, @CurrentUser() user: UserModel) {
-		const scheme = await this.schemeService.updateScheme(id, body.url, user.id)
+		const scheme = await this.schemeService.getSchemeDetail(id, user.id)
 		if (!scheme) {
+			throw new NotFoundException('URL을 찾을수 없습니다.')
+		}
+		const isValidUrl = this.schemeService.validUrl(scheme.type, body.url)
+		if (!isValidUrl) {
 			throw new BadRequestException('잘못된 URL 입니다.')
 		}
+		const updatedScheme = await this.schemeService.updateScheme(id, body.url, user.id)
+		if (!updatedScheme) {
+			throw new NotFoundException('URL을 찾을수 없습니다.')
+		}
 		return PutSchemeModifyResponse.builder()
-			.scheme(scheme)
+			.scheme(updatedScheme)
 			.build()
 	}
 

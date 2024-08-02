@@ -144,6 +144,10 @@ export class SchemeService {
 			return channelPattern.test(url)
 		} else if (type === SchemeType.YOUTUBE_VIDEO) {
 			return (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url))
+		} else if (type === SchemeType.INSTAGRAM_PROFILE) {
+			return profilePattern.test(url)
+		} else if (type === SchemeType.INSTAGRAM_POST) {
+			return postPattern.test(url)
 		}
 		return false
 	}
