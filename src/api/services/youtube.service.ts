@@ -103,7 +103,7 @@ export class YoutubeService {
 
 	private getLastTime(captions: Caption[]) {
 		const lastCaption = captions[captions.length - 1]
-		return Math.floor(lastCaption.offset)
+		return Math.floor(lastCaption.offset + lastCaption.duration)
 	}
 
 	private getPoint(videoTime: number) {
