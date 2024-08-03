@@ -45,12 +45,13 @@ export class YoutubeController {
 	@ApiOperation({ summary: 'youtube info 의 자막정보 (for lambda)' })
 	@CommonResponse({ type: GetYoutubeCaptionListResponse })
 	async getYoutubeCaptionList(@Param('id') id: number) {
-		const captions = await this.youtubeService.getYoutubeCaptionList(id)
-		if (!captions) {
+		const result = await this.youtubeService.getYoutubeCaptionList(id)
+		if (!result) {
 			throw new NotFoundException('not found youtube info')
 		}
 		return GetYoutubeCaptionListResponse.builder()
-			.captions(captions)
+			.captions(result.captions)
+			.lang(result.lang)
 			.build()
 
 	}

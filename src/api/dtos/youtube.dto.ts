@@ -10,6 +10,9 @@ export class GetYoutubeCaptionListResponse {
 
 	@ApiProperty({ type: YoutubeCaptionModel, isArray: true })
 	captions: YoutubeCaptionModel[]
+
+	@ApiProperty()
+	lang: string
 }
 
 export class PostYoutubeCheckUrlRequest {

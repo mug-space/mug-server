@@ -32,8 +32,13 @@ export class YoutubeService {
 				youtubeId,
 			},
 		})
+
 		if (youtubeInfo) {
-			return plainToInstance(YoutubeCaptionModel, youtubeInfo.captions, { excludeExtraneousValues: true })
+			const lang = youtubeInfo.captions[0].lang || 'ko'
+			return {
+				captions: plainToInstance(YoutubeCaptionModel, youtubeInfo.captions, { excludeExtraneousValues: true }),
+				lang,
+			}
 		}
 		return null
 	}
