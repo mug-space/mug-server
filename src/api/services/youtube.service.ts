@@ -160,6 +160,18 @@ export class YoutubeService {
 		return youtubeTimestamp.id
 	}
 
+	async deleteYoutubeTimestamp(youtubeId: number) {
+		const timestamps = await this.youtubeTimestampRepository.find({ where: {
+			youtubeId,
+		} })
+		if (timestamps.length) {
+			await this.youtubeTimestampRepository.delete({
+				youtubeId,
+			})
+		}
+
+	}
+
 	async getYoutube(youtubeId: number) {
 		return this.youtubeRepository.findOne({ where: { id: youtubeId } })
 	}

@@ -39,7 +39,25 @@ export class PostYoutubeTimestampGenerateRequest {
 	youtubeId: number
 }
 
+export class PostYoutubeTimestampRegenerateRequest {
+	@ApiProperty()
+	@IsDefined()
+	youtubeId: number
+}
+
 export class PostYoutubeTimestampGenerateResponse {
+
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty({ type: Boolean })
+	result: boolean
+
+	@ApiProperty()
+	point: number
+
+}
+
+export class PostYoutubeTimestampRegenerateResponse {
 
 	static readonly builder = () => Builder(this)
 

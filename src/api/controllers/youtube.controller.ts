@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Param, Post,
-	Put, Query, UnauthorizedException, UseGuards } from '@nestjs/common'
+	Put, UnauthorizedException, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
@@ -7,6 +7,8 @@ import { CommonResponse } from 'src/common/response'
 import { GetYoutubeCaptionListResponse, GetYoutubeDetailResponse, GetYoutubeListResponse,
 	PostYoutubeCheckUrlRequest, PostYoutubeCheckUrlResponse,
 	PostYoutubeTimestampGenerateRequest, PostYoutubeTimestampGenerateResponse,
+	PostYoutubeTimestampRegenerateRequest,
+	PostYoutubeTimestampRegenerateResponse,
 	PutYoutubeUpdateTimestampListRequest,
 	PutYoutubeUpdateTimestampStatusRequest } from '../dtos/youtube.dto'
 import { YoutubeService } from '../services/youtube.service'
@@ -69,6 +71,31 @@ export class YoutubeController {
 			.youtubeId(result?.youtubeId || null)
 			.timestampPoint(result?.point || 0)
 			.build()
+	}
+
+	@Post('timestamp-regenerate')
+	@ApiOperation({ summary: 'youtube timestamp 에러인경우 다시 돌릴수있게' })
+	@CommonResponse({ type: PostYoutubeTimestampRegenerateResponse })
+	@UseGuards(JwtAuthGuard)
+	@Transactional({ propagation: Propagation.REQUIRED })
+	async regenerateYoutubeTimestamp(@CurrentUser() user: UserModel | null, @Body() body: PostYoutubeTimestampRegenerateRequest) {
+		if (!user) {
+			throw new UnauthorizedException('required login')
+		}
+		await this.youtubeService.deleteYoutubeTimestamp(body.youtubeId)
+		const firstTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
+		const secondTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
+		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, firstTimestampId, 'openai')
+		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, secondTimestampId, 'claude')
+		const u = await this.userService.getUserById(user.id)
+		if (!u) {
+			throw new NotFoundException('not found user')
+		}
+		return PostYoutubeTimestampGenerateResponse.builder()
+			.result(true)
+			.point(u.point)
+			.build()
+
 	}
 
 	@Post('timestamp-generate')
