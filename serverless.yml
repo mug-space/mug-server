@@ -2,8 +2,15 @@ service: mug-space-server
 
 plugins:
   - serverless-domain-manager
+  - serverless-plugin-warmup
 
 custom:
+  warmup:
+    default:
+      enabled: true
+      events:
+        - schedule: rate(5 minutes)  # 주기적으로 Lambda 함수를 호출
+      concurrency: 1
   customDomains:
     - domainName: api.mug-space.io
       basePath: ''
@@ -75,15 +82,32 @@ provider:
     binaryMediaTypes:
       - '*/*'
 
+resources:
+  Resources:
+    ApiAlias:
+      Type: AWS::Lambda::Alias
+      Properties:
+        FunctionName:
+          Ref: ApiLambdaFunction
+        FunctionVersion:
+          "Fn::GetAtt":
+            - ApiLambdaFunction
+            - Version
+        Name: provisioned
+        ProvisionedConcurrencyConfig:
+          ProvisionedConcurrentExecutions: 1
+
 functions:
   api:
     handler: dist/lambda.handler
+    provisionedConcurrency: 1
     package:
       patterns:
         - '!.git/**'
         - '!src/**'
         - '!node_modules/@types/**'
         - '!node_modules/serverless/**'
+        - '!node_modules/serverless-plugin-warmup/**'
         - '!node_modules/serverless-domain-manager/**'
         - '!node_modules/.cache/**'
         - '!node_modules/.yarn/**'

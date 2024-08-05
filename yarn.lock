@@ -8785,6 +8785,11 @@ serverless-http@^3.2.0:
   resolved "https://registry.yarnpkg.com/serverless-http/-/serverless-http-3.2.0.tgz#68acc7735f7c876733c04f038ee20f31f5ebfc9b"
   integrity sha512-QvSyZXljRLIGqwcJ4xsKJXwkZnAVkse1OajepxfjkBXV0BMvRS5R546Z4kCBI8IygDzkQY0foNPC/rnipaE9pQ==
 
+serverless-plugin-warmup@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/serverless-plugin-warmup/-/serverless-plugin-warmup-8.3.0.tgz#cbeab9bac0c91c3b63a8eeead2e091c15e6a5fbc"
+  integrity sha512-FBPPfY6CFdg/BAbvR+UrgHUFNgkUsQxXApSUVwoBqoaLH7amc2aCUYxYncJaD+kRLHTD4WKB0VC7QuyfUPJ+XQ==
+
 serverless@^3.38.0:
   version "3.39.0"
   resolved "https://registry.yarnpkg.com/serverless/-/serverless-3.39.0.tgz#699fbea4d0b0ba0baba0510be743f9d025ac363d"
