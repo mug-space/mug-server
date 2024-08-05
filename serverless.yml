@@ -84,6 +84,12 @@ provider:
 
 resources:
   Resources:
+    ApiLambdaFunctionVersion:
+      Type: AWS::Lambda::Version
+      Properties:
+        FunctionName:
+          Ref: ApiLambdaFunction
+
     ApiAlias:
       Type: AWS::Lambda::Alias
       Properties:
@@ -91,7 +97,7 @@ resources:
           Ref: ApiLambdaFunction
         FunctionVersion:
           Fn::GetAtt:
-            - ApiLambdaFunction
+            - ApiLambdaFunctionVersion
             - Version
         Name: provisioned
         ProvisionedConcurrencyConfig:
@@ -129,4 +135,3 @@ functions:
       - http:
           path: /{proxy+}
           method: ANY
-
