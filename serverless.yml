@@ -88,9 +88,9 @@ resources:
       Type: AWS::Lambda::Alias
       Properties:
         FunctionName:
-          Ref: ApiLambdaFunction
+          Ref: ApiLambdaFunction
         FunctionVersion:
-          "Fn::GetAtt":
+          Fn::GetAtt:
             - ApiLambdaFunction
             - Version
         Name: provisioned
