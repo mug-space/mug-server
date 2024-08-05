@@ -82,31 +82,9 @@ provider:
     binaryMediaTypes:
       - '*/*'
 
-resources:
-  Resources:
-    ApiLambdaFunctionVersion:
-      Type: AWS::Lambda::Version
-      Properties:
-        FunctionName:
-          Ref: ApiLambdaFunction
-
-    ApiAlias:
-      Type: AWS::Lambda::Alias
-      Properties:
-        FunctionName:
-          Ref: ApiLambdaFunction
-        FunctionVersion:
-          Fn::GetAtt:
-            - ApiLambdaFunctionVersion
-            - Version
-        Name: provisioned
-        ProvisionedConcurrencyConfig:
-          ProvisionedConcurrentExecutions: 1
-
 functions:
   api:
     handler: dist/lambda.handler
-    provisionedConcurrency: 1
     package:
       patterns:
         - '!.git/**'
