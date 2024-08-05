@@ -5,7 +5,7 @@ export class SecretManager {
 	async getEnv(): Promise<Record<string, any>> {
 		try {
 			const params = {
-				SecretId: process.env.NODE_ENV === 'production' ? 'prod/mugspace-server/env' : 'dev/mugspace-server/env',
+				SecretId: 'prod/mugspace-server/env',
 			}
 			const command = new GetSecretValueCommand(params)
 			const data = await client.send(command)

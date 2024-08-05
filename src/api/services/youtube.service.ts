@@ -240,7 +240,8 @@ export class YoutubeService {
 	async invokeYoutubeTimestampLambda(youtubeId: number, youtubeTimestampId: number, generateType: string) {
 
 		if (this.configService.get('NODE_ENV') === 'local') {
-			await this.httpService.post('http://localhost:8001/generate-timestamp', { youtubeId }).toPromise()
+			this.httpService.post('http://localhost:8001/generate-timestamp', {
+				youtubeId, youtubeTimestampId, generateType }).toPromise()
 		} else {
 			const lambda = new Lambda({
 				region: 'ap-northeast-2',
