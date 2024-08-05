@@ -23,8 +23,10 @@ const shortPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/
 const livePattern = /^(https?:\/\/)?(www\.)?youtube\.com\/live\/[\w-]+/
 const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
 const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
-const profilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
-const postPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
+const igProfilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
+const igPostPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
+const fbProfilePattern = /facebook\.com\/profile\.php\?id=([\w-]+)/
+const fbPostPattern = /facebook\.com\/.*\/posts\/([\w-]+)/
 
 @Injectable()
 export class SchemeService {
@@ -69,13 +71,17 @@ export class SchemeService {
 	private makeCusotmUrl(type: SchemeType, path: string) {
 		switch (type) {
 			case SchemeType.YOUTUBE_CHANNEL:
-				return `https://s.mug-space.io/s/youtube/c/${path}`
+				return `https://s.mug-space.io/yt/c/${path}`
 			case SchemeType.YOUTUBE_VIDEO:
-				return `https://s.mug-space.io/s/youtube/v/${path}`
+				return `https://s.mug-space.io/yt/v/${path}`
 			case SchemeType.INSTAGRAM_PROFILE:
-				return `https://s.mug-space.io/s/instagram/u/${path}`
+				return `https://s.mug-space.io/ig/u/${path}`
 			case SchemeType.INSTAGRAM_POST:
-				return `https://s.mug-space.io/s/instagram/p/${path}`
+				return `https://s.mug-space.io/ig/p/${path}`
+			case SchemeType.FACEBOOK_PROFILE:
+				return `https://s.mug-space.io/fb/u/${path}`
+			case SchemeType.FACEBOOK_POST:
+				return `https://s.mug-space.io/fb/p/${path}`
 			default:
 				return ''
 		}
@@ -125,7 +131,7 @@ export class SchemeService {
 		return null
 	}
 
-	makeAndroidSchemeUrl(url: string) {
+	makeYoutubeAndroidSchemeUrl(url: string) {
 		if (url.includes('youtube.com')) {
 			return `intent://${url.replace(/^https?:\/\//, '')}#Intent;package=com.google.android.youtube;scheme=https;end;`
 		} else if (url.includes('youtu.be')) {
@@ -135,7 +141,7 @@ export class SchemeService {
 		}
 	}
 
-	makeIOSSchemeUrl(url: string) {
+	makeYoutubeIOSSchemeUrl(url: string) {
 		return `youtube://${url.replace('https://', '')}`
 	}
 
@@ -145,16 +151,31 @@ export class SchemeService {
 		} else if (type === SchemeType.YOUTUBE_VIDEO) {
 			return (videoPattern.test(url) || shortPattern.test(url) || livePattern.test(url) || youtuPattern.test(url))
 		} else if (type === SchemeType.INSTAGRAM_PROFILE) {
-			return profilePattern.test(url)
+			return igProfilePattern.test(url)
 		} else if (type === SchemeType.INSTAGRAM_POST) {
-			return postPattern.test(url)
+			return igPostPattern.test(url)
+		} else if (type === SchemeType.FACEBOOK_PROFILE) {
+			return fbProfilePattern.test(url)
+		} else if (type === SchemeType.FACEBOOK_POST) {
+			return fbPostPattern.test(url)
 		}
 		return false
 	}
 
-	makeInstagramProfileUrl(url: string): InstagramUrlTypeResult {
-		if (profilePattern.test(url)) {
-			const matches = url.match(profilePattern)
+	getPointByType(type: SchemeType) {
+		switch (type) {
+			case SchemeType.YOUTUBE_CHANNEL:
+			case SchemeType.FACEBOOK_PROFILE:
+			case SchemeType.INSTAGRAM_PROFILE:
+				return 500
+			default:
+				return 200
+		}
+	}
+
+	makeInstagramProfileUrl(url: string): UrlTypeResult {
+		if (igProfilePattern.test(url)) {
+			const matches = url.match(igProfilePattern)
 			const username = matches ? matches[3] : ''
 			return {
 				webUrl: `https://www.instagram.com/${username}`,
@@ -168,9 +189,9 @@ export class SchemeService {
 		}
 	}
 
-	makeInstagramPostUrls(url: string): InstagramUrlTypeResult {
-		if (postPattern.test(url)) {
-			const matches = url.match(postPattern)
+	makeInstagramPostUrls(url: string): UrlTypeResult {
+		if (igPostPattern.test(url)) {
+			const matches = url.match(igPostPattern)
 			const postId = matches ? matches[3] : ''
 			return {
 				webUrl: `https://www.instagram.com/p/${postId}`,
@@ -180,6 +201,34 @@ export class SchemeService {
 			return {
 				webUrl: url,
 				mobileUrl: url,
+			}
+		}
+	}
+
+	makeFacebookProfileUrls(baseUrl: string): UrlTypeResult {
+		if (fbProfilePattern.test(baseUrl)) {
+			const profileId = baseUrl.match(fbProfilePattern)?.[1]
+			return {
+				webUrl: `https://www.facebook.com/profile.php?id=${profileId}`,
+				mobileUrl: `fb://profile/${profileId}`,
+			}
+		} else {
+			return {
+				webUrl: baseUrl, mobileUrl: baseUrl,
+			}
+		}
+	}
+
+	makeFacebookPostUrls(baseUrl: string): UrlTypeResult {
+		if (fbPostPattern.test(baseUrl)) {
+			const postId = baseUrl.match(fbPostPattern)?.[1]
+			return {
+				webUrl: `https://www.facebook.com/${postId}`,
+				mobileUrl: `fb://post/${postId}`,
+			}
+		} else {
+			return {
+				webUrl: baseUrl, mobileUrl: baseUrl,
 			}
 		}
 	}
@@ -272,9 +321,53 @@ export class SchemeService {
 				`
 	}
 
+	makeFacebookResponseHtml(redirectUrl: string, webUrl: string) {
+		return `
+				<!DOCTYPE html>
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<title>Redirect to Facebook App</title>
+					<style>
+						body {
+							background-color: black;
+							color: white;
+							display: flex;
+							justify-content: center;
+							align-items: center;
+							height: 100vh;
+							margin: 0;
+							font-family: Arial, sans-serif;
+						}
+					</style>
+					<script>
+					function redirectToYouTubeApp() {
+						// Custom URL Scheme
+						const youtubeAppURL = '${redirectUrl}';
+
+						// Attempt to open the YouTube app
+						window.location = youtubeAppURL;
+
+						// Fallback to the YouTube web page after a delay
+						setTimeout(function() {
+						window.location = '${webUrl}';
+						}, 2000); // 2 seconds delay
+					}
+
+					window.onload = redirectToYouTubeApp;
+					</script>
+				</head>
+				<body>
+					<div>Redirecting to Facebook...</div>
+				</body>
+				</html>
+				`
+	}
+
 }
 
-interface InstagramUrlTypeResult {
+interface UrlTypeResult {
 	webUrl: string;
 	mobileUrl: string;
 }

@@ -14,6 +14,14 @@ export class PointService {
 	@InjectRepository(UserRepository)
 	private readonly userRepository: UserRepository
 
+	async hasPoint(userId: number, point: number) {
+		const user = await this.userRepository.findOne({ where: { id: userId } })
+		if (user) {
+			return user.point >= point
+		}
+		return false
+	}
+
 	async getPointLogList(userId: number) {
 		const pointLogs = await this.pointLogRepository.find({ where: {
 			userId,

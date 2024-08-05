@@ -10,6 +10,7 @@ import { SchemeType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
+import { PointService } from '../services/point.service'
 import { SchemeService, UserAgentDevice } from '../services/scheme.service'
 
 @Controller()
@@ -18,6 +19,8 @@ export class SchemeController {
 
 	@Inject()
 	private readonly schemeService: SchemeService
+	@Inject()
+	private readonly pointService: PointService
 
 	@Get('s/check-device')
 	// @UseGuards(DomainGuard)
@@ -27,7 +30,7 @@ export class SchemeController {
 		return this.schemeService.detectDevice(userAgent)
 	}
 
-	@Get('s/youtube/c/:path')
+	@Get('yt/c/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeChannel(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -37,9 +40,9 @@ export class SchemeController {
 			const userAgent = req.headers['user-agent']
 			const device = this.schemeService.detectDevice(userAgent)
 			if (device === UserAgentDevice.Android) {
-				redirectUrl = this.schemeService.makeAndroidSchemeUrl(scheme.url)
+				redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
 			} else if (device === UserAgentDevice.iOS) {
-				redirectUrl = this.schemeService.makeIOSSchemeUrl(scheme.url)
+				redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
 			} else {
 				redirectUrl = scheme.url
 			}
@@ -50,7 +53,7 @@ export class SchemeController {
 
 	}
 
-	@Get('s/youtube/v/:path')
+	@Get('yt/v/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectYoutubeVideo(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -60,9 +63,9 @@ export class SchemeController {
 			const userAgent = req.headers['user-agent']
 			const device = this.schemeService.detectDevice(userAgent)
 			if (device === UserAgentDevice.Android) {
-				redirectUrl = this.schemeService.makeAndroidSchemeUrl(scheme.url)
+				redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
 			} else if (device === UserAgentDevice.iOS) {
-				redirectUrl = this.schemeService.makeIOSSchemeUrl(scheme.url)
+				redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
 			} else {
 				redirectUrl = scheme.url
 			}
@@ -72,7 +75,7 @@ export class SchemeController {
 		}
 	}
 
-	@Get('s/instagram/u/:path')
+	@Get('ig/u/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectInstagramProfile(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -93,7 +96,7 @@ export class SchemeController {
 		}
 	}
 
-	@Get('s/instagram/p/:path')
+	@Get('ig/p/:path')
 	// @UseGuards(DomainGuard)
 	@ApiExcludeEndpoint()
 	async redirectInstagramPost(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
@@ -114,6 +117,48 @@ export class SchemeController {
 		}
 	}
 
+	@Get('fb/u/:path')
+	// @UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
+	async redirectFacebookProfile(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.FACEBOOK_PROFILE)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			const device = this.schemeService.detectDevice(userAgent)
+			const urls = this.schemeService.makeFacebookProfileUrls(scheme.url)
+			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+				redirectUrl = urls.mobileUrl
+			} else {
+				redirectUrl = urls.webUrl
+			}
+			res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
+		} else {
+			res.redirect('https://mug-space.io')
+		}
+	}
+
+	@Get('fb/p/:path')
+	// @UseGuards(DomainGuard)
+	@ApiExcludeEndpoint()
+	async redirectFacebookPost(@Param('path') path: string, @Req() req: Request, @Res() res: Response) {
+		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.FACEBOOK_POST)
+		let redirectUrl = 'https://mug-space.io'
+		if (scheme) {
+			const userAgent = req.headers['user-agent']
+			const device = this.schemeService.detectDevice(userAgent)
+			const urls = this.schemeService.makeFacebookPostUrls(scheme.url)
+			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+				redirectUrl = urls.mobileUrl
+			} else {
+				redirectUrl = urls.webUrl
+			}
+			res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
+		} else {
+			res.redirect('https://mug-space.io')
+		}
+	}
+
 	@Post('schemes')
 	@ApiOperation({ summary: 'scheme url 생성' })
 	@CommonResponse({ type: PostSchemeAddResponse })
@@ -121,12 +166,15 @@ export class SchemeController {
 	async addSchemeUrl(@Body() body: PostSchemeAddRequest, @CurrentUser() user: UserModel) {
 		const isValidUrl = this.schemeService.validUrl(body.type, body.url)
 		if (!isValidUrl) {
-			throw new BadRequestException('잘못된 URL 입니다.')
+			throw new BadRequestException('잘못된 주소 입니다.')
+		}
+		const decrementPoint = this.schemeService.getPointByType(body.type)
+		const hasPoint = await this.pointService.hasPoint(user.id, decrementPoint)
+		if (!hasPoint) {
+			throw new BadRequestException('포인트가 충분하지 않습니다.')
 		}
 		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id)
-		if (!scheme) {
-			throw new BadRequestException('잘못된 URL 입니다.')
-		}
+		await this.pointService.decrementPoint(user.id, decrementPoint)
 		return PostSchemeAddResponse.builder()
 			.scheme(scheme)
 			.build()
@@ -139,16 +187,23 @@ export class SchemeController {
 	async updateSchemeUrl(@Param('id') id: number, @Body() body: PutSchemeModifyRequest, @CurrentUser() user: UserModel) {
 		const scheme = await this.schemeService.getSchemeDetail(id, user.id)
 		if (!scheme) {
-			throw new NotFoundException('URL을 찾을수 없습니다.')
+			throw new NotFoundException('데이터를 찾을수 없습니다.')
 		}
 		const isValidUrl = this.schemeService.validUrl(scheme.type, body.url)
 		if (!isValidUrl) {
-			throw new BadRequestException('잘못된 URL 입니다.')
+			throw new BadRequestException('잘못된 주소 입니다.')
+		}
+		const decrementPoint = this.schemeService.getPointByType(scheme.type)
+		const modifyDecrementPoint = decrementPoint / 2
+		const hasPoint = await this.pointService.hasPoint(user.id, modifyDecrementPoint)
+		if (!hasPoint) {
+			throw new BadRequestException('포인트가 충분하지 않습니다.')
 		}
 		const updatedScheme = await this.schemeService.updateScheme(id, body.url, user.id)
 		if (!updatedScheme) {
-			throw new NotFoundException('URL을 찾을수 없습니다.')
+			throw new NotFoundException('데이터를 찾을수 없습니다.')
 		}
+		await this.pointService.decrementPoint(user.id, modifyDecrementPoint)
 		return PutSchemeModifyResponse.builder()
 			.scheme(updatedScheme)
 			.build()
