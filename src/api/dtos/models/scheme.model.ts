@@ -10,6 +10,11 @@ export enum SchemeType {
 	FACEBOOK_PROFILE = 'FACEBOOK_PROFILE',
 }
 
+export enum SchemeExpireType {
+	ONE_MONTH = 'ONE_MONTH',
+	SIX_MONTH = 'SIX_MONTH',
+}
+
 export class SchemeModel {
 
 	@Expose()
@@ -19,6 +24,14 @@ export class SchemeModel {
 	@Expose()
 	@ApiProperty({ enum: SchemeType })
 	type: SchemeType
+
+	@Expose()
+	@ApiProperty({ enum: SchemeExpireType })
+	expireType: SchemeExpireType
+
+	@Expose()
+	@ApiProperty({ description: '만료일' })
+	expiredAt: number
 
 	@Expose()
 	@ApiProperty({ type: String, nullable: false, description: '이동할 web url' })
@@ -31,4 +44,18 @@ export class SchemeModel {
 	@Expose()
 	@ApiProperty({ description: 'custom url 뒤에 붙을 입력받은 path' })
 	path: string
+}
+
+export class SchemePoint {
+	@Expose()
+	@ApiProperty({ enum: SchemeType })
+	type: SchemeType
+
+	@Expose()
+	@ApiProperty({ enum: SchemeExpireType })
+	expireType: SchemeExpireType
+
+	@Expose()
+	@ApiProperty()
+	point: number
 }

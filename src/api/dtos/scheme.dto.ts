@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Builder } from 'builder-pattern'
 import { IsDefined, IsEnum } from 'class-validator'
-import { SchemeModel, SchemeType } from './models/scheme.model'
+import { SchemeExpireType, SchemeModel, SchemePoint, SchemeType } from './models/scheme.model'
 
 export class PostSchemeAddRequest {
 	@ApiProperty({ type: String, nullable: false })
@@ -15,6 +15,10 @@ export class PostSchemeAddRequest {
 	@ApiProperty()
 	@IsDefined()
 	path: string
+
+	@ApiProperty({ enum: SchemeExpireType })
+	@IsEnum(SchemeExpireType)
+	expireType: SchemeExpireType
 }
 
 export class PostSchemeAddResponse {
@@ -44,6 +48,13 @@ export class GetSchemeListResponse {
 
 	@ApiProperty({ type: SchemeModel, isArray: true })
 	schemes: SchemeModel[]
+}
+
+export class GetSchemePointListResponse {
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty({ type: SchemePoint, isArray: true })
+	schemePoints: SchemePoint[]
 }
 
 export class GetSchemeDetailResponse {

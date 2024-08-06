@@ -8,7 +8,7 @@ import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
 import { SchemeType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
-import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
+import { GetSchemeDetailResponse, GetSchemeListResponse, GetSchemePointListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
 import { PointLogType } from '../entities/point-log.entity'
 import { PointService } from '../services/point.service'
@@ -169,7 +169,10 @@ export class SchemeController {
 		if (!isValidUrl) {
 			throw new BadRequestException('잘못된 주소 입니다.')
 		}
-		const decrementPoint = this.schemeService.getPointByType(body.type)
+		const decrementPoint = this.schemeService.getPointByType(body.type, body.expireType)
+		if (decrementPoint === 0) {
+			throw new BadRequestException('잘못된 생성 조건입니다.')
+		}
 		const hasPoint = await this.pointService.hasPoint(user.id, decrementPoint)
 		if (!hasPoint) {
 			throw new BadRequestException('포인트가 충분하지 않습니다.')
@@ -194,7 +197,10 @@ export class SchemeController {
 		if (!isValidUrl) {
 			throw new BadRequestException('잘못된 주소 입니다.')
 		}
-		const decrementPoint = this.schemeService.getPointByType(scheme.type)
+		const decrementPoint = this.schemeService.getPointByType(scheme.type, scheme.expireType)
+		if (decrementPoint === 0) {
+			throw new BadRequestException('잘못된 생성 조건입니다.')
+		}
 		const modifyDecrementPoint = decrementPoint / 2
 		const hasPoint = await this.pointService.hasPoint(user.id, modifyDecrementPoint)
 		if (!hasPoint) {
@@ -207,6 +213,16 @@ export class SchemeController {
 		await this.pointService.decrementPoint(user.id, modifyDecrementPoint, PointLogType.사용)
 		return PutSchemeModifyResponse.builder()
 			.scheme(updatedScheme)
+			.build()
+	}
+
+	@Get('schemes/points')
+	@ApiOperation({ summary: '생성 타입, 기간별 포인트 목록' })
+	@CommonResponse({ type: GetSchemePointListResponse })
+	async getSchemePointList() {
+		const list = this.schemeService.getSchemePoints()
+		return GetSchemePointListResponse.builder()
+			.schemePoints(list)
 			.build()
 	}
 

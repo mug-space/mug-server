@@ -40,6 +40,13 @@ export class SchemeEntity {
 	})
 	url: string
 
+	@Column('datetime', {
+		nullable: false,
+		comment: '만료일',
+		transformer: new DateTransformer(),
+	})
+	expiredAt: number
+
 	@CreateDateColumn({
 		transformer: new DateTransformer(),
 	})

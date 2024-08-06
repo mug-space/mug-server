@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { SchemeRepository } from '../repositories/scheme.repository'
-import { SchemeModel, SchemeType } from '../dtos/models/scheme.model'
+import { SchemeExpireType, SchemeModel, SchemeType } from '../dtos/models/scheme.model'
 import { plainToInstance } from 'class-transformer'
 
 export enum UserAgentDevice {
@@ -162,15 +162,28 @@ export class SchemeService {
 		return false
 	}
 
-	getPointByType(type: SchemeType) {
-		switch (type) {
-			case SchemeType.YOUTUBE_CHANNEL:
-			case SchemeType.FACEBOOK_PROFILE:
-			case SchemeType.INSTAGRAM_PROFILE:
-				return 500
-			default:
-				return 200
+	getPointByType(type: SchemeType, expiredType: SchemeExpireType) {
+		if (expiredType === SchemeExpireType.ONE_MONTH) {
+			switch (type) {
+				case SchemeType.YOUTUBE_CHANNEL:
+				case SchemeType.FACEBOOK_PROFILE:
+				case SchemeType.INSTAGRAM_PROFILE:
+					return 500
+				default:
+					return 200
+			}
+
+		} else if (expiredType === SchemeExpireType.SIX_MONTH) {
+			switch (type) {
+				case SchemeType.YOUTUBE_CHANNEL:
+				case SchemeType.FACEBOOK_PROFILE:
+				case SchemeType.INSTAGRAM_PROFILE:
+					return 1000
+				default:
+					return 400
+			}
 		}
+		return 0
 	}
 
 	makeInstagramProfileUrl(url: string): UrlTypeResult {
@@ -363,6 +376,71 @@ export class SchemeService {
 				</body>
 				</html>
 				`
+	}
+
+	getSchemePoints() {
+		return [
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.YOUTUBE_CHANNEL,
+				point: 1000,
+			},
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.YOUTUBE_VIDEO,
+				point: 400,
+			},
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.INSTAGRAM_PROFILE,
+				point: 1000,
+			},
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.INSTAGRAM_POST,
+				point: 400,
+			},
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.FACEBOOK_PROFILE,
+				point: 1000,
+			},
+			{
+				expireType: SchemeExpireType.SIX_MONTH,
+				type: SchemeType.FACEBOOK_POST,
+				point: 400,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.YOUTUBE_CHANNEL,
+				point: 500,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.YOUTUBE_VIDEO,
+				point: 200,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.INSTAGRAM_PROFILE,
+				point: 500,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.INSTAGRAM_POST,
+				point: 200,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.FACEBOOK_PROFILE,
+				point: 500,
+			},
+			{
+				expireType: SchemeExpireType.ONE_MONTH,
+				type: SchemeType.FACEBOOK_POST,
+				point: 200,
+			},
+		]
 	}
 
 }
