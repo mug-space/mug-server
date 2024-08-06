@@ -38,6 +38,13 @@ export class AuthController {
 			sameSite: 'none',
 			domain: this.configService.get('CLIENT_HOST'),
 		})
+		res.cookie('auth', { token }, {
+			maxAge: 1000 * 60 * 60 * 24 * 30, // 30일
+			httpOnly: true,
+			secure: true,
+			sameSite: 'none',
+			domain: 'bursting-currently-akita.ngrok-free.app',
+		})
 		res.cookie('is_signin', true, {
 			maxAge: 1000 * 60 * 60 * 24 * 60, // 30일
 			domain: this.configService.get('CLIENT_HOST'),

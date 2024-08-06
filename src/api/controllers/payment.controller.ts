@@ -12,7 +12,7 @@ import { ProductService } from '../services/product.service'
 import { UserService } from '../services/user.service'
 
 @Controller('payments')
-@ApiTags('Billing')
+@ApiTags('Payment')
 @UseGuards(JwtAuthGuard)
 export class PaymentController {
 

@@ -13,6 +13,7 @@ export default class TypeOrmConfig implements TypeOrmOptionsFactory {
 		return {
 			replication: dbInfo,
 			logging: this.configService.get('DATABASE_LOGGING') === true,
+			// logging: true,
 			timezone: 'Z',
 			port: 3306,
 			type: 'mysql',
