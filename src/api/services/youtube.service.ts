@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { YoutubeRepository } from '../repositories/youtube.repository'
 import { YoutubeInfoRepository } from '../repositories/youtube-info.repository'
 import { YoutubeTimestampRepository } from '../repositories/youtube-timestamp.repository'
-import { YoutubeTranscript } from 'youtube-transcript'
+import { YoutubeTranscript, YoutubeTranscriptDisabledError,
+	YoutubeTranscriptNotAvailableError, YoutubeTranscriptNotAvailableLanguageError,
+	YoutubeTranscriptVideoUnavailableError } from 'youtube-transcript'
 import { plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
 import { HttpService } from '@nestjs/axios'
@@ -231,6 +233,15 @@ export class YoutubeService {
 			const transcriptResponse = await YoutubeTranscript.fetchTranscript(videoId)
 			return plainToInstance(Caption, transcriptResponse)
 		} catch (error) {
+			if (error instanceof YoutubeTranscriptDisabledError) {
+
+			} else if (error instanceof YoutubeTranscriptVideoUnavailableError) {
+
+			} else if (error instanceof YoutubeTranscriptNotAvailableError) {
+
+			} else if (error instanceof YoutubeTranscriptNotAvailableLanguageError) {
+
+			}
 			console.error(error)
 			return null
 		}
