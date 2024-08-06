@@ -16,7 +16,6 @@ import { PaymentStatus } from '../entities/payment.entity'
 
 @Controller('payments')
 @ApiTags('Payment')
-@UseGuards(JwtAuthGuard)
 export class PaymentController {
 
 	@Inject()
@@ -30,6 +29,7 @@ export class PaymentController {
 
 	@Get()
 	@ApiOperation({ summary: '결제 이력' })
+	@UseGuards(JwtAuthGuard)
 	@CommonResponse({ type: GetPaymentListResponse })
 	async getPaymentList(@CurrentUser() user: UserModel | null) {
 		if (!user) {
@@ -43,6 +43,7 @@ export class PaymentController {
 	}
 
 	@Post('confirm')
+	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '결제 처리후 전달받은 paymentKey와 함께 최종승인 호출' })
 	@CommonResponse({ type: PostPaymentConfirmResponse })
 	async confirmPayment(@CurrentUser() user: UserModel | null, @Body() body: PostPaymentConfirmRequest) {
@@ -74,6 +75,7 @@ export class PaymentController {
 	@ApiExcludeEndpoint()
 	async paymentStatusChangeCallback(@Body() body: { eventType: string, createdAt: string, data: TossPayment }) {
 		try {
+			console.log(body)
 			const payment = await this.paymentService.getPaymentByPaymentKey(body.data.paymentKey)
 			if (payment) {
 				if (body.data.status === PaymentStatus.CANCELED) {
