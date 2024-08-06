@@ -5,6 +5,7 @@ import { YoutubeInfoRepository } from '../repositories/youtube-info.repository'
 import { YoutubeTimestampRepository } from '../repositories/youtube-timestamp.repository'
 import { YoutubeTranscript, YoutubeTranscriptDisabledError,
 	YoutubeTranscriptNotAvailableError, YoutubeTranscriptNotAvailableLanguageError,
+	YoutubeTranscriptTooManyRequestError,
 	YoutubeTranscriptVideoUnavailableError } from 'youtube-transcript'
 import { plainToInstance } from 'class-transformer'
 import { Caption } from '../entities/youtube-info.entity'
@@ -13,6 +14,7 @@ import { Lambda } from '@aws-sdk/client-lambda'
 import { TimeStampModel, YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
 import { YoutubeCaptionModel, YoutubeModel, YoutubeSimpleModel, YoutubeTimestampModel } from '../dtos/models/youtube.model'
 import { ConfigService } from '@nestjs/config'
+import { sleepTime } from 'src/common/utils/date'
 
 @Injectable()
 export class YoutubeService {
@@ -51,7 +53,7 @@ export class YoutubeService {
 			where: { userId },
 			order: { id: 'DESC' },
 		})
-		return youtubeList.map((youtube) => {
+		return youtubeList.filter((youtube) => youtube.youtubeTimestamps.length).map((youtube) => {
 			const isCompleted = youtube.youtubeTimestamps.every((timestamp) => timestamp.status === YoutubeTimestampStatus.COMPLETED)
 			return plainToInstance(YoutubeSimpleModel, {
 				...youtube,
@@ -229,22 +231,27 @@ export class YoutubeService {
 	}
 
 	async getCaption(videoId: string) {
-		try {
-			const transcriptResponse = await YoutubeTranscript.fetchTranscript(videoId)
-			return plainToInstance(Caption, transcriptResponse)
-		} catch (error) {
-			if (error instanceof YoutubeTranscriptDisabledError) {
-
-			} else if (error instanceof YoutubeTranscriptVideoUnavailableError) {
-
-			} else if (error instanceof YoutubeTranscriptNotAvailableError) {
-
-			} else if (error instanceof YoutubeTranscriptNotAvailableLanguageError) {
-
+		let retryCnt = 0
+		do {
+			try {
+				const transcriptResponse = await YoutubeTranscript.fetchTranscript(videoId)
+				return plainToInstance(Caption, transcriptResponse)
+			} catch (error) {
+				console.error(error)
+				if (error instanceof YoutubeTranscriptTooManyRequestError) {
+					await sleepTime(3000)
+					retryCnt++
+				}
+				if (error instanceof YoutubeTranscriptDisabledError ||
+					error instanceof YoutubeTranscriptVideoUnavailableError ||
+					error instanceof YoutubeTranscriptNotAvailableError ||
+					error instanceof YoutubeTranscriptNotAvailableLanguageError
+				) {
+					retryCnt = 2
+				}
 			}
-			console.error(error)
-			return null
-		}
+		} while (retryCnt < 2)
+		return null
 
 	}
 
