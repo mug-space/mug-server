@@ -173,11 +173,15 @@ export class SchemeController {
 		if (decrementPoint === 0) {
 			throw new BadRequestException('잘못된 생성 조건입니다.')
 		}
+		const existPath = await this.schemeService.existPath(body.path)
+		if (existPath) {
+			throw new BadRequestException('이미 등록된 커스텀 경로입니다.')
+		}
 		const hasPoint = await this.pointService.hasPoint(user.id, decrementPoint)
 		if (!hasPoint) {
 			throw new BadRequestException('포인트가 충분하지 않습니다.')
 		}
-		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id)
+		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id, body.expireType)
 		await this.pointService.decrementPoint(user.id, decrementPoint, PointLogType.사용)
 		return PostSchemeAddResponse.builder()
 			.scheme(scheme)

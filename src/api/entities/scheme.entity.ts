@@ -6,7 +6,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
-import { SchemeType } from '../dtos/models/scheme.model'
+import { SchemeExpireType, SchemeType } from '../dtos/models/scheme.model'
 import { DateTransformer } from './date.transformer'
 
 @Entity('schemes')
@@ -36,6 +36,13 @@ export class SchemeEntity {
 
 	@Column('varchar', {
 		nullable: false,
+		comment: 'scheme expire type',
+		default: SchemeExpireType.ONE_MONTH,
+	})
+	expireType: SchemeExpireType
+
+	@Column('varchar', {
+		nullable: false,
 		comment: 'origin url',
 	})
 	url: string
@@ -44,6 +51,7 @@ export class SchemeEntity {
 		nullable: false,
 		comment: '만료일',
 		transformer: new DateTransformer(),
+		default: (() => 'NOW()'),
 	})
 	expiredAt: number
 

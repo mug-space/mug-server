@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { SchemeRepository } from '../repositories/scheme.repository'
 import { SchemeExpireType, SchemeModel, SchemeType } from '../dtos/models/scheme.model'
 import { plainToInstance } from 'class-transformer'
+import dayjs from 'dayjs'
+import { IsNull } from 'typeorm'
 
 export enum UserAgentDevice {
 	Android = 'Android',
@@ -56,9 +58,10 @@ export class SchemeService {
 		}
 	}
 
-	async addScheme(url: string, type: SchemeType, path: string, userId: number) {
+	async addScheme(url: string, type: SchemeType, path: string, userId: number, expireType: SchemeExpireType) {
+		const expiredAt = expireType === SchemeExpireType.ONE_MONTH ? dayjs().add(1, 'months') : dayjs().add(6, 'months')
 		const scheme = this.schemeRepository.create({
-			path, url, userId, type,
+			path, url, userId, type, expireType, expiredAt: expiredAt.valueOf(),
 		})
 		await this.schemeRepository.save(scheme)
 		const customUrl = this.makeCusotmUrl(type, path)
@@ -160,6 +163,12 @@ export class SchemeService {
 			return fbPostPattern.test(url)
 		}
 		return false
+	}
+
+	async existPath(path: string) {
+		return await this.schemeRepository.exists({ where: {
+			path, deletedAt: IsNull(),
+		} })
 	}
 
 	getPointByType(type: SchemeType, expiredType: SchemeExpireType) {
