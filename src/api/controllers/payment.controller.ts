@@ -1,6 +1,6 @@
 import { BadRequestException, Body, Controller, Get, Inject, NotFoundException, Post,
 	UnauthorizedException, UseGuards } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { ApiExcludeEndpoint, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
@@ -10,6 +10,7 @@ import { GetPaymentListResponse, PostPaymentConfirmRequest, PostPaymentConfirmRe
 import { PointService } from '../services/point.service'
 import { ProductService } from '../services/product.service'
 import { UserService } from '../services/user.service'
+import { TossPayment } from '../dtos/models/toss-payment.dto'
 
 @Controller('payments')
 @ApiTags('Payment')
@@ -65,6 +66,16 @@ export class PaymentController {
 		return PostPaymentConfirmResponse.builder()
 			.point(updatedUser.point)
 			.build()
+	}
+
+	@Post('callback')
+	@ApiExcludeEndpoint()
+	async paymentStatusChangeCallback(@Body() body: { eventType: string, createdAt: string, data: TossPayment }) {
+		const payment = await this.paymentService.getPaymentByPaymentKey(body.data.paymentKey)
+		if (payment) {
+			await this.paymentService.updatePayment(body.data, body.data.paymentKey)
+		}
+		return true
 	}
 
 }

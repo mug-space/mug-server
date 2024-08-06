@@ -56,6 +56,14 @@ export class PaymentService {
 		await this.paymentRepository.save(payment)
 	}
 
+	async updatePayment(tossPayment: TossPayment, paymentKey: string) {
+		await this.paymentRepository.update({
+			paymentKey,
+		}, {
+			paymentInfo: tossPayment,
+		})
+	}
+
 	async getPaymentList(userId: number) {
 		const paymentList = await this.paymentRepository.find({ where: { userId: userId }, order: { id: 'DESC' } })
 
@@ -67,6 +75,20 @@ export class PaymentService {
 			}, { excludeExtraneousValues: true })
 		})
 
+	}
+
+	async getPaymentByPaymentKey(paymentKey: string) {
+		const payment = await this.paymentRepository.findOne({ where: {
+			paymentKey,
+		} })
+		if (payment) {
+			return plainToInstance(PaymentModel, {
+				...payment,
+				receipt: payment.paymentInfo.receipt,
+				easyPay: payment.paymentInfo.easyPay,
+			}, { excludeExtraneousValues: true })
+		}
+		return null
 	}
 
 }
