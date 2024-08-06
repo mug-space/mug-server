@@ -81,14 +81,7 @@ export class PaymentService {
 		const payment = await this.paymentRepository.findOne({ where: {
 			paymentKey,
 		} })
-		if (payment) {
-			return plainToInstance(PaymentModel, {
-				...payment,
-				receipt: payment.paymentInfo.receipt,
-				easyPay: payment.paymentInfo.easyPay,
-			}, { excludeExtraneousValues: true })
-		}
-		return null
+		return payment
 	}
 
 }

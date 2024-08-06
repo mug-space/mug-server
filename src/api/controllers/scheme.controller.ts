@@ -10,6 +10,7 @@ import { SchemeType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
+import { PointLogType } from '../entities/point-log.entity'
 import { PointService } from '../services/point.service'
 import { SchemeService, UserAgentDevice } from '../services/scheme.service'
 
@@ -174,7 +175,7 @@ export class SchemeController {
 			throw new BadRequestException('포인트가 충분하지 않습니다.')
 		}
 		const scheme = await this.schemeService.addScheme(body.url, body.type, body.path, user.id)
-		await this.pointService.decrementPoint(user.id, decrementPoint)
+		await this.pointService.decrementPoint(user.id, decrementPoint, PointLogType.사용)
 		return PostSchemeAddResponse.builder()
 			.scheme(scheme)
 			.build()
@@ -203,7 +204,7 @@ export class SchemeController {
 		if (!updatedScheme) {
 			throw new NotFoundException('데이터를 찾을수 없습니다.')
 		}
-		await this.pointService.decrementPoint(user.id, modifyDecrementPoint)
+		await this.pointService.decrementPoint(user.id, modifyDecrementPoint, PointLogType.사용)
 		return PutSchemeModifyResponse.builder()
 			.scheme(updatedScheme)
 			.build()

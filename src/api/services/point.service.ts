@@ -38,10 +38,10 @@ export class PointService {
 		return false
 	}
 
-	async decrementPoint(userId: number, point: number) {
+	async decrementPoint(userId: number, point: number, type: PointLogType) {
 		const result = await this.userRepository.decrementPoint(userId, point)
 		if (result) {
-			await this.pointLogRepository.savePointLog(userId, point, PointLogType.사용)
+			await this.pointLogRepository.savePointLog(userId, point, type)
 			return true
 		}
 		return false

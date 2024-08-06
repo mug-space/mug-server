@@ -17,6 +17,7 @@ import { PointService } from '../services/point.service'
 import { UserService } from '../services/user.service'
 import { Propagation, Transactional } from 'typeorm-transactional'
 import { YoutubeTimestampStatus } from '../entities/youtube-timestamp.entity'
+import { PointLogType } from '../entities/point-log.entity'
 
 @Controller('youtubes')
 @ApiTags('Youtube')
@@ -119,7 +120,7 @@ export class YoutubeController {
 		if (!hasPoint) {
 			throw new BadRequestException('not enough point')
 		}
-		await this.pointService.decrementPoint(user.id, timestampPoint)
+		await this.pointService.decrementPoint(user.id, timestampPoint, PointLogType.사용)
 		const firstTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
 		const secondTimestampId = await this.youtubeService.addYoutubeTimestamp(body.youtubeId)
 		await this.youtubeService.invokeYoutubeTimestampLambda(body.youtubeId, firstTimestampId, 'openai')

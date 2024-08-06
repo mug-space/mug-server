@@ -11,6 +11,8 @@ import { PointService } from '../services/point.service'
 import { ProductService } from '../services/product.service'
 import { UserService } from '../services/user.service'
 import { TossPayment } from '../dtos/models/toss-payment.dto'
+import { PointLogType } from '../entities/point-log.entity'
+import { PaymentStatus } from '../entities/payment.entity'
 
 @Controller('payments')
 @ApiTags('Payment')
@@ -71,11 +73,22 @@ export class PaymentController {
 	@Post('callback')
 	@ApiExcludeEndpoint()
 	async paymentStatusChangeCallback(@Body() body: { eventType: string, createdAt: string, data: TossPayment }) {
-		const payment = await this.paymentService.getPaymentByPaymentKey(body.data.paymentKey)
-		if (payment) {
-			await this.paymentService.updatePayment(body.data, body.data.paymentKey)
+		try {
+			const payment = await this.paymentService.getPaymentByPaymentKey(body.data.paymentKey)
+			if (payment) {
+				if (body.data.status === PaymentStatus.CANCELED) {
+					const point = await this.productService.getPointByOrderId(payment.orderId)
+					if (point) {
+						await this.pointService.decrementPoint(payment.userId, point, PointLogType.취소)
+					}
+				}
+				await this.paymentService.updatePayment(body.data, body.data.paymentKey)
+			}
+			return true
+		} catch (error) {
+			throw error
 		}
-		return true
+
 	}
 
 }
