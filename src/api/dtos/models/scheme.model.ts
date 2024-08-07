@@ -20,6 +20,12 @@ export enum SchemeUsableType {
 	EXPIRED = 'EXPIRED',
 }
 
+export class SchemeOGData {
+	title: string | null
+	image: string | null
+	description: string | null
+}
+
 export class SchemeModel {
 
 	@Expose()

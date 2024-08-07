@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { SchemeRepository } from '../repositories/scheme.repository'
-import { SchemeExpireType, SchemeModel, SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
+import { SchemeExpireType, SchemeModel, SchemeOGData, SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
 import { plainToInstance } from 'class-transformer'
 import dayjs from 'dayjs'
 import { IsNull } from 'typeorm'
@@ -64,9 +64,22 @@ export class SchemeService {
 	}
 
 	async addScheme(url: string, type: SchemeType, path: string, userId: number, expireType: SchemeExpireType) {
+		let og = null
+		try {
+			const ogsResult = await ogs({ url, fetchOptions: { headers: { 'user-agent': userAgent } } })
+			if (ogsResult && !ogsResult.error && ogsResult.result.success) {
+				og = new SchemeOGData()
+				og.title = ogsResult.result.ogTitle || null
+				og.description = ogsResult.result.ogDescription || null
+				og.image = ogsResult.result.ogImage && ogsResult.result.ogImage.length ? ogsResult.result.ogImage[0].url || null : null
+			}
+		} catch (error) {
+			console.error(error)
+		}
+
 		const expiredAt = expireType === SchemeExpireType.ONE_MONTH ? dayjs().add(1, 'months') : dayjs().add(6, 'months')
 		const scheme = this.schemeRepository.create({
-			path, url, userId, type, expireType, expiredAt: expiredAt.valueOf(),
+			path, url, userId, type, expireType, expiredAt: expiredAt.valueOf(), og,
 		})
 		await this.schemeRepository.save(scheme)
 		return this.definedSchemeModel(scheme)
@@ -307,18 +320,20 @@ export class SchemeService {
 		}
 	}
 
-	async makeYoutubeResponseHtml(redirectUrl: string, webUrl: string) {
-		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
+	makeYoutubeResponseHtml(redirectUrl: string, webUrl: string, og: SchemeOGData | null) {
 		let meta = ''
-		if (ogsResult.result.ogTitle) {
-			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
+		if (og) {
+			if (og.title) {
+				meta += `<meta property="og:title" content="${og.title}" >`
+			}
+			if (og.description) {
+				meta += `<meta property="og:description" content="${og.description}" >`
+			}
+			if (og.image) {
+				meta += `<meta property="og:image" content="${og.image}" >`
+			}
 		}
-		if (ogsResult.result.ogDescription) {
-			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
-		}
-		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
-			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
-		}
+
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
@@ -364,17 +379,18 @@ export class SchemeService {
 				`
 	}
 
-	async makeInstagramResponseHtml(redirectUrl: string, webUrl: string) {
-		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
+	makeInstagramResponseHtml(redirectUrl: string, webUrl: string, og: SchemeOGData | null) {
 		let meta = ''
-		if (ogsResult.result.ogTitle) {
-			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
-		}
-		if (ogsResult.result.ogDescription) {
-			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
-		}
-		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
-			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
+		if (og) {
+			if (og.title) {
+				meta += `<meta property="og:title" content="${og.title}" >`
+			}
+			if (og.description) {
+				meta += `<meta property="og:description" content="${og.description}" >`
+			}
+			if (og.image) {
+				meta += `<meta property="og:image" content="${og.image}" >`
+			}
 		}
 		return `
 				<!DOCTYPE html>
@@ -421,20 +437,20 @@ export class SchemeService {
 				`
 	}
 
-	async makeFacebookResponseHtml(redirectUrl: string, webUrl: string) {
+	makeFacebookResponseHtml(redirectUrl: string, webUrl: string, og: SchemeOGData | null) {
 
-		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
 		let meta = ''
-		if (ogsResult.result.ogTitle) {
-			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
+		if (og) {
+			if (og.title) {
+				meta += `<meta property="og:title" content="${og.title}" >`
+			}
+			if (og.description) {
+				meta += `<meta property="og:description" content="${og.description}" >`
+			}
+			if (og.image) {
+				meta += `<meta property="og:image" content="${og.image}" >`
+			}
 		}
-		if (ogsResult.result.ogDescription) {
-			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
-		}
-		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
-			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
-		}
-		console.log(meta)
 		return `
 				<!DOCTYPE html>
 				<html lang="en">

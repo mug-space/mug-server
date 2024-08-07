@@ -49,7 +49,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = scheme.url
 				}
-				res.send(await this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url))
+				res.send(this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -74,7 +74,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = scheme.url
 				}
-				res.send(await this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url))
+				res.send(this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -97,7 +97,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = urls.webUrl
 				}
-				res.send(await this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
+				res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -120,7 +120,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = urls.webUrl
 				}
-				res.send(await this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
+				res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -143,7 +143,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = urls.webUrl
 				}
-				res.send(await this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
+				res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -166,7 +166,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = urls.webUrl
 				}
-				res.send(await this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
+				res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl, scheme.og))
 			}
 		} else {
 			res.redirect('https://mug-space.io')

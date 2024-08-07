@@ -6,7 +6,7 @@ import {
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm'
-import { SchemeExpireType, SchemeType } from '../dtos/models/scheme.model'
+import { SchemeExpireType, SchemeOGData, SchemeType } from '../dtos/models/scheme.model'
 import { DateTransformer } from './date.transformer'
 
 @Entity('schemes')
@@ -46,6 +46,13 @@ export class SchemeEntity {
 		comment: 'origin url',
 	})
 	url: string
+
+	@Column('json', {
+		nullable: true,
+		comment: 'open graph data',
+		default: null,
+	})
+	og: SchemeOGData | null
 
 	@Column('datetime', {
 		nullable: false,
