@@ -32,6 +32,8 @@ const igPostPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
 const fbProfilePattern = /facebook\.com\/profile\.php\?id=([\w-]+)/
 const fbPostPattern = /facebook\.com\/.*\/posts\/([\w-]+)/
 
+const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
+
 @Injectable()
 export class SchemeService {
 
@@ -280,7 +282,18 @@ export class SchemeService {
 		}
 	}
 
-	makeYoutubeResponseHtml(redirectUrl: string, webUrl: string) {
+	async makeYoutubeResponseHtml(redirectUrl: string, webUrl: string) {
+		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
+		let meta = ''
+		if (ogsResult.result.ogTitle) {
+			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
+		}
+		if (ogsResult.result.ogDescription) {
+			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
+		}
+		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
+			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
+		}
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
@@ -288,6 +301,7 @@ export class SchemeService {
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
 					<meta property="og:url" content="${webUrl}" >
+					${meta}
 					<title>Redirect to YouTube App</title>
 					<style>
 						body {
@@ -325,7 +339,18 @@ export class SchemeService {
 				`
 	}
 
-	makeInstagramResponseHtml(redirectUrl: string, webUrl: string) {
+	async makeInstagramResponseHtml(redirectUrl: string, webUrl: string) {
+		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
+		let meta = ''
+		if (ogsResult.result.ogTitle) {
+			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
+		}
+		if (ogsResult.result.ogDescription) {
+			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
+		}
+		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
+			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
+		}
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
@@ -333,6 +358,7 @@ export class SchemeService {
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
 					<meta property="og:url" content="${webUrl}" >
+					${meta}
 					<title>Redirect to Instagram App</title>
 					<style>
 						body {
@@ -371,8 +397,8 @@ export class SchemeService {
 	}
 
 	async makeFacebookResponseHtml(redirectUrl: string, webUrl: string) {
-		const ogsResult = await ogs({ url: webUrl })
 
+		const ogsResult = await ogs({ url: webUrl, fetchOptions: { headers: { 'user-agent': userAgent } } })
 		let meta = ''
 		if (ogsResult.result.ogTitle) {
 			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
@@ -383,6 +409,7 @@ export class SchemeService {
 		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
 			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
 		}
+		console.log(meta)
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
