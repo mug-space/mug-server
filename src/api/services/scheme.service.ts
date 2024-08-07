@@ -5,6 +5,8 @@ import { SchemeExpireType, SchemeModel, SchemeType, SchemeUsableType } from '../
 import { plainToInstance } from 'class-transformer'
 import dayjs from 'dayjs'
 import { IsNull } from 'typeorm'
+import { SchemeEntity } from '../entities/scheme.entity'
+import ogs from 'open-graph-scraper'
 
 export enum UserAgentDevice {
 	Android = 'Android',
@@ -64,11 +66,7 @@ export class SchemeService {
 			path, url, userId, type, expireType, expiredAt: expiredAt.valueOf(),
 		})
 		await this.schemeRepository.save(scheme)
-		const customUrl = this.makeCusotmUrl(type, path)
-		return plainToInstance(SchemeModel, {
-			...scheme,
-			customUrl,
-		}, { excludeExtraneousValues: true })
+		return this.definedSchemeModel(scheme)
 	}
 
 	private makeCusotmUrl(type: SchemeType, path: string) {
@@ -90,6 +88,23 @@ export class SchemeService {
 		}
 	}
 
+	async updateSchemeExpiredAt(id: number, expireType: SchemeExpireType) {
+		const addMonth = expireType === SchemeExpireType.ONE_MONTH ? 1 : 6
+		const scheme = await this.schemeRepository.findOne({ where: {
+			id,
+		} })
+		if (scheme) {
+			if (dayjs(scheme.expiredAt).isBefore()) {
+				scheme.expiredAt = dayjs().add(addMonth, 'months').valueOf()
+			} else {
+				scheme.expiredAt = dayjs(scheme.expiredAt).add(addMonth).valueOf()
+			}
+			await this.schemeRepository.save(scheme)
+			return this.definedSchemeModel(scheme)
+		}
+		return null
+	}
+
 	async updateScheme(id: number, url: string, userId: number) {
 		const scheme = await this.schemeRepository.findOne({ where: {
 			id,
@@ -98,8 +113,7 @@ export class SchemeService {
 			if (scheme.userId === userId) {
 				scheme.url = url
 				await this.schemeRepository.save(scheme)
-				const customUrl = this.makeCusotmUrl(scheme.type, scheme.path)
-				return plainToInstance(SchemeModel, { ...scheme, customUrl }, { excludeExtraneousValues: true })
+				return this.definedSchemeModel(scheme)
 
 			}
 		}
@@ -111,13 +125,17 @@ export class SchemeService {
 			userId,
 		} })
 		return list.map((scheme) => {
-			return plainToInstance(SchemeModel, {
-				...scheme,
-				customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
-				usableType: this.getUsableType(scheme.expiredAt),
-			}, { excludeExtraneousValues: true })
+			return this.definedSchemeModel(scheme)
 		})
 
+	}
+
+	private definedSchemeModel(scheme: SchemeEntity) {
+		return plainToInstance(SchemeModel, {
+			...scheme,
+			customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
+			usableType: this.getUsableType(scheme.expiredAt),
+		}, { excludeExtraneousValues: true })
 	}
 
 	async getSchemeDetail(id: number, userId: number) {
@@ -352,7 +370,19 @@ export class SchemeService {
 				`
 	}
 
-	makeFacebookResponseHtml(redirectUrl: string, webUrl: string) {
+	async makeFacebookResponseHtml(redirectUrl: string, webUrl: string) {
+		const ogsResult = await ogs({ url: webUrl })
+
+		let meta = ''
+		if (ogsResult.result.ogTitle) {
+			meta += `<meta property="og:title" content="${ogsResult.result.ogTitle}" >`
+		}
+		if (ogsResult.result.ogDescription) {
+			meta += `<meta property="og:description" content="${ogsResult.result.ogDescription}" >`
+		}
+		if (ogsResult.result.ogImage && ogsResult.result.ogImage.length) {
+			meta += `<meta property="og:image" content="${ogsResult.result.ogImage[0].url}" >`
+		}
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
@@ -360,6 +390,7 @@ export class SchemeService {
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
 					<meta property="og:url" content="${webUrl}" >
+					${meta}
 					<title>Redirect to Facebook App</title>
 					<style>
 						body {

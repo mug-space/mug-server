@@ -43,6 +43,21 @@ export class PutSchemeModifyResponse {
 	scheme: SchemeModel
 }
 
+export class PutSchemeExpiredAtModifyRequest {
+	@ApiProperty({ enum: SchemeExpireType })
+	@IsDefined()
+	@IsEnum(SchemeExpireType)
+	expireType: SchemeExpireType
+}
+
+export class PutSchemeExpiredAtModifyResponse {
+
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty({ type: SchemeModel })
+	scheme: SchemeModel
+}
+
 export class GetSchemeListResponse {
 	static readonly builder = () => Builder(this)
 

@@ -9,7 +9,8 @@ import { CommonResponse } from 'src/common/response'
 import { SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, GetSchemePointListResponse, PostSchemeAddRequest,
-	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
+	PostSchemeAddResponse, PutSchemeExpiredAtModifyRequest,
+	PutSchemeExpiredAtModifyResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
 import { PointLogType } from '../entities/point-log.entity'
 import { PointService } from '../services/point.service'
 import { SchemeService, UserAgentDevice } from '../services/scheme.service'
@@ -198,6 +199,35 @@ export class SchemeController {
 		return PostSchemeAddResponse.builder()
 			.scheme(scheme)
 			.build()
+	}
+
+	@Put('schemes/:id(\\d+)/expired-at')
+	@ApiOperation({ summary: 'scheme url 기간 연장' })
+	@CommonResponse({ type: PutSchemeExpiredAtModifyResponse })
+	@UseGuards(JwtAuthGuard)
+	async updateSchemeExpiredAt(@Param('id') id: number, @Body() body: PutSchemeExpiredAtModifyRequest, @CurrentUser() user: UserModel) {
+		const scheme = await this.schemeService.getSchemeDetail(id, user.id)
+		if (!scheme) {
+			throw new NotFoundException('데이터를 찾을수 없습니다.')
+		}
+		const decrementPoint = this.schemeService.getPointByType(scheme.type, body.expireType)
+		if (decrementPoint === 0) {
+			throw new BadRequestException('잘못된 생성 조건입니다.')
+		}
+
+		const hasPoint = await this.pointService.hasPoint(user.id, decrementPoint)
+		if (!hasPoint) {
+			throw new BadRequestException('포인트가 충분하지 않습니다.')
+		}
+		const updatedScheme = await this.schemeService.updateSchemeExpiredAt(id, body.expireType)
+		if (!updatedScheme) {
+			throw new NotFoundException('데이터를 찾을수 없습니다.')
+		}
+		await this.pointService.decrementPoint(user.id, decrementPoint, PointLogType.사용)
+		return PutSchemeExpiredAtModifyResponse.builder()
+			.scheme(updatedScheme)
+			.build()
+
 	}
 
 	@Put('schemes/:id(\\d+)')
