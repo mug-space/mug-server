@@ -48,7 +48,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = scheme.url
 				}
-				res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
+				res.send(this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url))
 			}
 		} else {
 			res.redirect('https://mug-space.io')
@@ -73,7 +73,7 @@ export class SchemeController {
 				} else {
 					redirectUrl = scheme.url
 				}
-				res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
+				res.send(this.schemeService.makeYoutubeResponseHtml(redirectUrl, scheme.url))
 			}
 		} else {
 			res.redirect('https://mug-space.io')

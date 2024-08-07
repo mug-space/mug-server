@@ -262,13 +262,14 @@ export class SchemeService {
 		}
 	}
 
-	makeResponseHtml(redirectUrl: string, webUrl: string) {
+	makeYoutubeResponseHtml(redirectUrl: string, webUrl: string) {
 		return `
 				<!DOCTYPE html>
 				<html lang="en">
 				<head>
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<meta property="og:url" content="${webUrl}" >
 					<title>Redirect to YouTube App</title>
 					<style>
 						body {
@@ -313,6 +314,7 @@ export class SchemeService {
 				<head>
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<meta property="og:url" content="${webUrl}" >
 					<title>Redirect to Instagram App</title>
 					<style>
 						body {
@@ -357,6 +359,7 @@ export class SchemeService {
 				<head>
 					<meta charset="UTF-8">
 					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<meta property="og:url" content="${webUrl}" >
 					<title>Redirect to Facebook App</title>
 					<style>
 						body {
