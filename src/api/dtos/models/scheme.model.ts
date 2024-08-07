@@ -15,6 +15,11 @@ export enum SchemeExpireType {
 	SIX_MONTH = 'SIX_MONTH',
 }
 
+export enum SchemeUsableType {
+	POSSIBLE = 'POSSIBLE',
+	EXPIRED = 'EXPIRED',
+}
+
 export class SchemeModel {
 
 	@Expose()
@@ -24,6 +29,10 @@ export class SchemeModel {
 	@Expose()
 	@ApiProperty({ enum: SchemeType })
 	type: SchemeType
+
+	@Expose()
+	@ApiProperty({ enum: SchemeUsableType })
+	usableType: SchemeUsableType
 
 	@Expose()
 	@ApiProperty({ enum: SchemeExpireType })

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { SchemeRepository } from '../repositories/scheme.repository'
-import { SchemeExpireType, SchemeModel, SchemeType } from '../dtos/models/scheme.model'
+import { SchemeExpireType, SchemeModel, SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
 import { plainToInstance } from 'class-transformer'
 import dayjs from 'dayjs'
 import { IsNull } from 'typeorm'
@@ -114,6 +114,7 @@ export class SchemeService {
 			return plainToInstance(SchemeModel, {
 				...scheme,
 				customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
+				usableType: this.getUsableType(scheme.expiredAt),
 			}, { excludeExtraneousValues: true })
 		})
 
@@ -129,6 +130,7 @@ export class SchemeService {
 			return plainToInstance(SchemeModel, {
 				...scheme,
 				customUrl: this.makeCusotmUrl(scheme.type, scheme.path),
+				usableType: this.getUsableType(scheme.expiredAt),
 			}, { excludeExtraneousValues: true })
 		}
 		return null
@@ -142,6 +144,11 @@ export class SchemeService {
 		} else {
 			return url
 		}
+	}
+
+	getUsableType(expiredAt: number) {
+		const expired = dayjs().isAfter(expiredAt)
+		return expired ? SchemeUsableType.EXPIRED : SchemeUsableType.POSSIBLE
 	}
 
 	makeYoutubeIOSSchemeUrl(url: string) {

@@ -6,7 +6,7 @@ import { DomainGuard } from 'src/common/auth/domain.guard'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
-import { SchemeType } from '../dtos/models/scheme.model'
+import { SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, GetSchemePointListResponse, PostSchemeAddRequest,
 	PostSchemeAddResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
@@ -38,16 +38,18 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_CHANNEL)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			if (device === UserAgentDevice.Android) {
-				redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
-			} else if (device === UserAgentDevice.iOS) {
-				redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
-			} else {
-				redirectUrl = scheme.url
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				if (device === UserAgentDevice.Android) {
+					redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
+				} else if (device === UserAgentDevice.iOS) {
+					redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
+				} else {
+					redirectUrl = scheme.url
+				}
+				res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 			}
-			res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -61,16 +63,18 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.YOUTUBE_VIDEO)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			if (device === UserAgentDevice.Android) {
-				redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
-			} else if (device === UserAgentDevice.iOS) {
-				redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
-			} else {
-				redirectUrl = scheme.url
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				if (device === UserAgentDevice.Android) {
+					redirectUrl = this.schemeService.makeYoutubeAndroidSchemeUrl(scheme.url)
+				} else if (device === UserAgentDevice.iOS) {
+					redirectUrl = this.schemeService.makeYoutubeIOSSchemeUrl(scheme.url)
+				} else {
+					redirectUrl = scheme.url
+				}
+				res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 			}
-			res.send(this.schemeService.makeResponseHtml(redirectUrl, scheme.url))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -83,15 +87,17 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.INSTAGRAM_PROFILE)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			const urls = this.schemeService.makeInstagramProfileUrl(scheme.url)
-			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
-				redirectUrl = urls.mobileUrl
-			} else {
-				redirectUrl = urls.webUrl
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				const urls = this.schemeService.makeInstagramProfileUrl(scheme.url)
+				if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+					redirectUrl = urls.mobileUrl
+				} else {
+					redirectUrl = urls.webUrl
+				}
+				res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
 			}
-			res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -104,15 +110,17 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.INSTAGRAM_POST)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			const urls = this.schemeService.makeInstagramPostUrls(scheme.url)
-			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
-				redirectUrl = urls.mobileUrl
-			} else {
-				redirectUrl = urls.webUrl
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				const urls = this.schemeService.makeInstagramPostUrls(scheme.url)
+				if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+					redirectUrl = urls.mobileUrl
+				} else {
+					redirectUrl = urls.webUrl
+				}
+				res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
 			}
-			res.send(this.schemeService.makeInstagramResponseHtml(redirectUrl, urls.webUrl))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -125,15 +133,17 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.FACEBOOK_PROFILE)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			const urls = this.schemeService.makeFacebookProfileUrls(scheme.url)
-			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
-				redirectUrl = urls.mobileUrl
-			} else {
-				redirectUrl = urls.webUrl
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				const urls = this.schemeService.makeFacebookProfileUrls(scheme.url)
+				if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+					redirectUrl = urls.mobileUrl
+				} else {
+					redirectUrl = urls.webUrl
+				}
+				res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
 			}
-			res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
@@ -146,15 +156,17 @@ export class SchemeController {
 		const scheme = await this.schemeService.getSchemeByPathAndType(path, SchemeType.FACEBOOK_POST)
 		let redirectUrl = 'https://mug-space.io'
 		if (scheme) {
-			const userAgent = req.headers['user-agent']
-			const device = this.schemeService.detectDevice(userAgent)
-			const urls = this.schemeService.makeFacebookPostUrls(scheme.url)
-			if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
-				redirectUrl = urls.mobileUrl
-			} else {
-				redirectUrl = urls.webUrl
+			const usableType = this.schemeService.getUsableType(scheme.expiredAt)
+			if (usableType === SchemeUsableType.POSSIBLE) {
+				const device = this.schemeService.detectDevice(req.headers['user-agent'])
+				const urls = this.schemeService.makeFacebookPostUrls(scheme.url)
+				if (device === UserAgentDevice.Android || device === UserAgentDevice.iOS ) {
+					redirectUrl = urls.mobileUrl
+				} else {
+					redirectUrl = urls.webUrl
+				}
+				res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
 			}
-			res.send(this.schemeService.makeFacebookResponseHtml(redirectUrl, urls.webUrl))
 		} else {
 			res.redirect('https://mug-space.io')
 		}
