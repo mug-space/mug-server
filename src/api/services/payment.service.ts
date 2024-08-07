@@ -60,6 +60,7 @@ export class PaymentService {
 		await this.paymentRepository.update({
 			paymentKey,
 		}, {
+			status: tossPayment.status,
 			paymentInfo: tossPayment,
 		})
 	}
