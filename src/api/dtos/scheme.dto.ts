@@ -78,3 +78,17 @@ export class GetSchemeDetailResponse {
 	@ApiProperty({ type: SchemeModel })
 	scheme: SchemeModel
 }
+
+export class PostSchemeCheckRequest {
+	@ApiProperty({ type: String, nullable: false })
+	@IsDefined()
+	url: string
+}
+
+export class PostSchemeCheckResponse {
+
+	static readonly builder = () => Builder(this)
+
+	@ApiProperty({ type: SchemePoint, isArray: true })
+	points: SchemePoint[]
+}

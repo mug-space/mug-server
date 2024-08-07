@@ -9,7 +9,7 @@ import { CommonResponse } from 'src/common/response'
 import { SchemeType, SchemeUsableType } from '../dtos/models/scheme.model'
 import { UserModel } from '../dtos/models/user.model'
 import { GetSchemeDetailResponse, GetSchemeListResponse, GetSchemePointListResponse, PostSchemeAddRequest,
-	PostSchemeAddResponse, PutSchemeExpiredAtModifyRequest,
+	PostSchemeAddResponse, PostSchemeCheckRequest, PostSchemeCheckResponse, PutSchemeExpiredAtModifyRequest,
 	PutSchemeExpiredAtModifyResponse, PutSchemeModifyRequest, PutSchemeModifyResponse } from '../dtos/scheme.dto'
 import { PointLogType } from '../entities/point-log.entity'
 import { PointService } from '../services/point.service'
@@ -259,6 +259,20 @@ export class SchemeController {
 		await this.pointService.decrementPoint(user.id, modifyDecrementPoint, PointLogType.사용)
 		return PutSchemeModifyResponse.builder()
 			.scheme(updatedScheme)
+			.build()
+	}
+
+	@Post('schemes/check')
+	@ApiOperation({ summary: '링크의 타입 및 포인트 조회' })
+	@CommonResponse({ type: PostSchemeCheckResponse })
+	async checkSchemeUrl(@Body() body: PostSchemeCheckRequest) {
+		const type = this.schemeService.getTypeByUrl(body.url)
+		if (!type) {
+			throw new BadRequestException('사용할수없는 주소입니다.')
+		}
+		const points = this.schemeService.getSchemePointsByType(type)
+		return PostSchemeCheckResponse.builder()
+			.points(points)
 			.build()
 	}
 

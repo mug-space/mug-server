@@ -29,7 +29,8 @@ const youtuPattern = /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/
 const channelPattern = /^(https?:\/\/)?(www\.)?youtube\.com\/(@[\w\p{L}-]+|channel\/[\w-]+)/u
 const igProfilePattern = /^(https?:\/\/)?(www\.)?instagram\.com\/([\w\p{L}-]+)/
 const igPostPattern = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([\w-]+)/
-const fbProfilePattern = /facebook\.com\/profile\.php\?id=([\w-]+)/
+const fbProfilePattern1 = /facebook\.com\/profile\.php\?id=([\w-]+)/
+const fbProfilePattern2 = /facebook\.com\/([\w.]+)/
 const fbPostPattern = /facebook\.com\/.*\/posts\/([\w-]+)/
 
 const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'
@@ -175,6 +176,24 @@ export class SchemeService {
 		return `youtube://${url.replace('https://', '')}`
 	}
 
+	getTypeByUrl(url: string) {
+		if (channelPattern.test(url)) {
+			return SchemeType.YOUTUBE_CHANNEL
+		} else if (videoPattern.test(url)) {
+			return SchemeType.YOUTUBE_VIDEO
+		} else if (igProfilePattern.test(url)) {
+			return SchemeType.INSTAGRAM_PROFILE
+		} else if (igPostPattern.test(url)) {
+			return SchemeType.INSTAGRAM_POST
+		} else if (fbProfilePattern1.test(url) || (fbProfilePattern2.test(url)) && !fbPostPattern.test(url)) {
+			return SchemeType.FACEBOOK_PROFILE
+		} else if (fbPostPattern.test(url)) {
+			return SchemeType.FACEBOOK_POST
+		}
+		return null
+
+	}
+
 	validUrl(type: SchemeType, url: string) {
 		if (type === SchemeType.YOUTUBE_CHANNEL) {
 			return channelPattern.test(url)
@@ -185,7 +204,7 @@ export class SchemeService {
 		} else if (type === SchemeType.INSTAGRAM_POST) {
 			return igPostPattern.test(url)
 		} else if (type === SchemeType.FACEBOOK_PROFILE) {
-			return fbProfilePattern.test(url)
+			return fbProfilePattern1.test(url) || (fbProfilePattern2.test(url)) && !fbPostPattern.test(url)
 		} else if (type === SchemeType.FACEBOOK_POST) {
 			return fbPostPattern.test(url)
 		}
@@ -255,11 +274,17 @@ export class SchemeService {
 	}
 
 	makeFacebookProfileUrls(baseUrl: string): UrlTypeResult {
-		if (fbProfilePattern.test(baseUrl)) {
-			const profileId = baseUrl.match(fbProfilePattern)?.[1]
+		if (fbProfilePattern1.test(baseUrl)) {
+			const profileId = baseUrl.match(fbProfilePattern1)?.[1]
 			return {
 				webUrl: `https://www.facebook.com/profile.php?id=${profileId}`,
 				mobileUrl: `fb://profile/${profileId}`,
+			}
+		} else if (fbProfilePattern2.test(baseUrl) && !fbPostPattern.test(baseUrl)) {
+			const username = baseUrl.match(fbProfilePattern2)?.[1]
+			return {
+				webUrl: `https://www.facebook.com/${username}`,
+				mobileUrl: `fb://profile/${username}`,
 			}
 		} else {
 			return {
@@ -453,6 +478,11 @@ export class SchemeService {
 				</body>
 				</html>
 				`
+	}
+
+	getSchemePointsByType(type: SchemeType) {
+		const points = this.getSchemePoints()
+		return points.filter((point) => point.type === type)
 	}
 
 	getSchemePoints() {
