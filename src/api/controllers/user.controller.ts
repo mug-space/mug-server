@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Inject, NotFoundException, Post, Put, UnauthorizedException, UseGuards } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { Body, Controller, Get, Inject, NotFoundException, Post, Put, UseGuards } from '@nestjs/common'
 import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import { BadRequestError } from 'solapi'
 import { JwtAuthGuard } from 'src/common/auth/jwt.guard'
 import { CurrentUser } from 'src/common/custom.decorator'
 import { CommonResponse } from 'src/common/response'
@@ -16,19 +16,13 @@ import { UserService } from '../services/user.service'
 export class UserController {
 
 	@Inject()
-	private readonly configService: ConfigService
-
-	@Inject()
 	private readonly userService: UserService
 
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '로그인 유저 정보' })
 	@CommonResponse({ type: GetUserMeResponse })
-	async userMe(@CurrentUser() user: UserEntity | null) {
-		if (!user) {
-			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
-		}
+	async userMe(@CurrentUser() user: UserEntity) {
 		const userModel = await this.userService.getUserById(user.id)
 		if (!userModel) {
 			throw new NotFoundException('유저정보를 찾을수 없습니다.')
@@ -42,9 +36,10 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '비밀번호 변경' })
 	@CommonResponse({ type: Boolean })
-	async changePassword(@CurrentUser() user: UserEntity | null, @Body() body: PutUserPasswordUpdateRequest) {
-		if (!user) {
-			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
+	async changePassword(@CurrentUser() user: UserEntity, @Body() body: PutUserPasswordUpdateRequest) {
+		const validPassword = this.userService.validatePassword(body.password)
+		if (!validPassword.isValid) {
+			throw new BadRequestError(validPassword.messages.join('\n'))
 		}
 		return await this.userService.updatePassword(user.id, body.password)
 	}
@@ -53,10 +48,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '이메일 변경' })
 	@CommonResponse({ type: Boolean })
-	async changeEmail(@CurrentUser() user: UserEntity | null, @Body() body: PutUserEmailUpdateRequest) {
-		if (!user) {
-			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
-		}
+	async changeEmail(@CurrentUser() user: UserEntity, @Body() body: PutUserEmailUpdateRequest) {
 		return await this.userService.updateEmail(user.id, body.email)
 	}
 
@@ -64,10 +56,7 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '전달받은 폰번호로 인증코드 발송' })
 	@CommonResponse({ type: Boolean })
-	async sendPhoneCode(@CurrentUser() user: UserEntity | null, @Body() body: PostUserSendPhoneCodeRequest) {
-		if (!user) {
-			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
-		}
+	async sendPhoneCode(@CurrentUser() user: UserEntity, @Body() body: PostUserSendPhoneCodeRequest) {
 		return await this.userService.sendPhoneCode(user.id, body.phone)
 	}
 
@@ -75,13 +64,8 @@ export class UserController {
 	@UseGuards(JwtAuthGuard)
 	@ApiOperation({ summary: '전달받은 폰번호로 인증코드 발송' })
 	@CommonResponse({ type: Boolean })
-	async verifyPhoneCode(@CurrentUser() user: UserEntity | null, @Body() body: PostUserVerifyPhoneCodeRequest) {
-		if (!user) {
-			throw new UnauthorizedException('로그인이 되어있지 않습니다.')
-		}
+	async verifyPhoneCode(@CurrentUser() user: UserEntity, @Body() body: PostUserVerifyPhoneCodeRequest) {
 		return await this.userService.verifyPhoneCode(user.id, body.phoneCode)
 	}
-
-	// TODO: EMAIL 변경
 
 }

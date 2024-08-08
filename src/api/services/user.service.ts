@@ -21,6 +21,35 @@ export class UserService {
 	@Inject()
 	private readonly alimtalkService: AlimtalkService
 
+	validatePassword(password: string): { isValid: boolean, messages: string[] } {
+		const messages: string[] = []
+		if (password.length < 8 || password.length > 19) {
+			messages.push('비밀번호는 8자 이상 19자 이하여야 합니다.')
+			// messages.push('Password must be between 8 and 19 characters long.')
+		}
+		if (!/[a-z]/.test(password)) {
+			messages.push('비밀번호에는 최소한 하나의 소문자가 포함되어야 합니다.')
+			// messages.push('Password must contain at least one lowercase letter.')
+		}
+		if (!/[A-Z]/.test(password)) {
+			messages.push('비밀번호에는 최소한 하나의 대문자가 포함되어야 합니다.')
+			// messages.push('Password must contain at least one uppercase letter.')
+		}
+		if (!/\d/.test(password)) {
+			messages.push('비밀번호에는 최소한 하나의 숫자가 포함되어야 합니다.')
+			// messages.push('Password must contain at least one number.')
+		}
+		if (!/[@$!%*?&]/.test(password)) {
+			messages.push('비밀번호에는 최소한 하나의 특수 문자(@$!%*?&)가 포함되어야 합니다.')
+			// messages.push('Password must contain at least one special character (@$!%*?&).')
+		}
+
+		return {
+			isValid: messages.length === 0,
+			messages: messages,
+		}
+	}
+
 	async existAccount(account: string) {
 		const exist = await this.userRepository.exists({ where: {
 			account, deletedAt: IsNull(),

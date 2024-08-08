@@ -68,6 +68,10 @@ export class AuthController {
 	@ApiOperation({ summary: '회원가입' })
 	@CommonResponse({ type: PostAuthSignUpResponse })
 	async postSignUp(@Body() body: PostAuthSignUpRequest, @Res({ passthrough: true }) res: Response) {
+		const validPassword = this.userService.validatePassword(body.password)
+		if (!validPassword.isValid) {
+			throw new BadRequestError(validPassword.messages.join('\n'))
+		}
 		const exist = await this.userService.existAccount(body.account)
 		if (exist) {
 			throw new BadRequestError('이미 가입된 계정입니다.')
