@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { IsNull } from 'typeorm'
 import { SchemeEntity } from '../entities/scheme.entity'
 import ogs from 'open-graph-scraper'
+import _ from 'lodash'
 
 export enum UserAgentDevice {
 	Android = 'Android',
@@ -207,6 +208,11 @@ export class SchemeService {
 
 	}
 
+	validPath(path: string) {
+		const regex = /^[a-z0-9-_]{1,10}$/
+		return regex.test(path)
+	}
+
 	validUrl(type: SchemeType, url: string) {
 		if (type === SchemeType.YOUTUBE_CHANNEL) {
 			return channelPattern.test(url)
@@ -231,27 +237,9 @@ export class SchemeService {
 	}
 
 	getPointByType(type: SchemeType, expiredType: SchemeExpireType) {
-		if (expiredType === SchemeExpireType.ONE_MONTH) {
-			switch (type) {
-				case SchemeType.YOUTUBE_CHANNEL:
-				case SchemeType.FACEBOOK_PROFILE:
-				case SchemeType.INSTAGRAM_PROFILE:
-					return 500
-				default:
-					return 200
-			}
-
-		} else if (expiredType === SchemeExpireType.SIX_MONTH) {
-			switch (type) {
-				case SchemeType.YOUTUBE_CHANNEL:
-				case SchemeType.FACEBOOK_PROFILE:
-				case SchemeType.INSTAGRAM_PROFILE:
-					return 1000
-				default:
-					return 400
-			}
-		}
-		return 0
+		const points = this.getSchemePointsByType(type)
+		const point = points.find((point) => point.expireType === expiredType)
+		return point ? point.point : 0
 	}
 
 	makeInstagramProfileUrl(url: string): UrlTypeResult {
@@ -501,69 +489,65 @@ export class SchemeService {
 		return points.filter((point) => point.type === type)
 	}
 
-	getSchemePoints() {
+	getSchemeDefaultPoints() {
 		return [
 			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.YOUTUBE_CHANNEL,
-				point: 1000,
-			},
-			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.YOUTUBE_VIDEO,
-				point: 400,
-			},
-			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.INSTAGRAM_PROFILE,
-				point: 1000,
-			},
-			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.INSTAGRAM_POST,
-				point: 400,
-			},
-			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.FACEBOOK_PROFILE,
-				point: 1000,
-			},
-			{
-				expireType: SchemeExpireType.SIX_MONTH,
-				type: SchemeType.FACEBOOK_POST,
-				point: 400,
-			},
-			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.YOUTUBE_CHANNEL,
 				point: 500,
 			},
 			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.YOUTUBE_VIDEO,
 				point: 200,
 			},
 			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.INSTAGRAM_PROFILE,
 				point: 500,
 			},
 			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.INSTAGRAM_POST,
 				point: 200,
 			},
 			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.FACEBOOK_PROFILE,
 				point: 500,
 			},
 			{
-				expireType: SchemeExpireType.ONE_MONTH,
 				type: SchemeType.FACEBOOK_POST,
 				point: 200,
 			},
 		]
+	}
+
+	calculatorPoint(type: SchemeExpireType, defaultPoint: number) {
+		switch (type) {
+			case SchemeExpireType.ONE_MONTH:
+				return defaultPoint
+			case SchemeExpireType.THREE_MONTH:
+				return defaultPoint * 1.5
+			case SchemeExpireType.SIX_MONTH:
+				return defaultPoint * 2
+			case SchemeExpireType.TWELVE_MONTH:
+				return defaultPoint * 3.5
+			default:
+				return defaultPoint
+		}
+	}
+
+	getSchemePoints() {
+		const defaultPoints = this.getSchemeDefaultPoints()
+		const totalPoints = []
+		for (const expireType of _.values(SchemeExpireType)) {
+			for (const defaultPoint of defaultPoints) {
+				totalPoints.push(
+					{
+						expireType: expireType,
+						type: defaultPoint.type,
+						point: this.calculatorPoint(expireType, defaultPoint.point),
+					},
+				)
+			}
+		}
+		return totalPoints
 	}
 
 }

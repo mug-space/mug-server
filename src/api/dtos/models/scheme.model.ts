@@ -12,7 +12,9 @@ export enum SchemeType {
 
 export enum SchemeExpireType {
 	ONE_MONTH = 'ONE_MONTH',
+	THREE_MONTH = 'THREE_MONTH',
 	SIX_MONTH = 'SIX_MONTH',
+	TWELVE_MONTH = 'TWELVE_MONTH',
 }
 
 export enum SchemeUsableType {

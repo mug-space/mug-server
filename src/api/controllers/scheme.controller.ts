@@ -178,6 +178,10 @@ export class SchemeController {
 	@CommonResponse({ type: PostSchemeAddResponse })
 	@UseGuards(JwtAuthGuard)
 	async addSchemeUrl(@Body() body: PostSchemeAddRequest, @CurrentUser() user: UserModel) {
+		const isValidPath = this.schemeService.validPath(body.path)
+		if (!isValidPath) {
+			throw new BadRequestException('링크 이름은 최소 1글자에서 최대 10글자까지의 문자열을 허용하며, 해당 문자열은 소문자 영어, 숫자, \'-\' 또는 \'_\' 만 포함할 수 있습니다.')
+		}
 		const isValidUrl = this.schemeService.validUrl(body.type, body.url)
 		if (!isValidUrl) {
 			throw new BadRequestException('잘못된 주소 입니다.')

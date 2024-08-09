@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import nodemailer from 'nodemailer'
