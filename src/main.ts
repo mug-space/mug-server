@@ -1,4 +1,4 @@
-import { initApp } from './App'
+import { initApp } from './app'
 
 const port = process.env.PORT || 8000
 // tslint:disable-next-line: no-floating-promises

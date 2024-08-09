@@ -81,5 +81,4 @@ function initDayjs() {
 		...koLocale,
 		weekStart: 1,
 	})
-	dayjs.tz.setDefault('Asia/Seoul')
 }

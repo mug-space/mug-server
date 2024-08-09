@@ -27,7 +27,7 @@ export class MailService {
 		})
 	}
 
-	async sendUserConfirmation(userEmail: string, userName: string, _youtubeName: string, _couponCode: string) {
+	async sendUserConfirmation(userEmail: string, userName: string, youtubeName: string, couponCode: string) {
 		const url = 'https://mug-space.io'
 
 		const mailOptions = {
@@ -116,13 +116,10 @@ export class MailService {
 <body>
     <div class="container">
         <div class="header">
-            <h1>안녕하세요, [크리에이터 이름]님!</h1>
+            <h1>안녕하세요, ${userName}님!</h1>
         </div>
         <div class="content">
-            <p>저는 [귀하의 이름]이며, [귀하의 회사/프로젝트/채널 이름]에서 [귀하의 직책]을 맡고 있습니다.</p>
-            <p>우연히 [크리에이터 이름]님의 유튜브 채널을 발견하게 되었고,
-            [특정 콘텐츠, 예: 최근 업로드한 비디오 제목]를 특히 인상 깊게 보았습니다.
-            [크리에이터 이름]님의 콘텐츠는 [특정 요소, 예: 창의적인 편집 스타일, 유익한 정보 등]이 돋보여 많은 사람들에게 유익함을 주고 있다고 생각합니다.</p>
+            <p>저희 서비스명은 머그스페이스입니다.</p>
             <img
             src="https://assets-global.website-files.com/62a6f472a43450de7620f8f5/63ed16c64c704f1970116f25_63ebbe0e8dce940f25ee7395_YouTube%2520Timestamp%2520Generator%2520-%2520Header.jpeg"
             alt="YouTube Chapters Benefits">
@@ -134,18 +131,18 @@ export class MailService {
                 <li><strong>구독자 증가</strong>: 유용한 챕터 기능 제공으로 채널에 대한 신뢰도가 올라갑니다.</li>
                 <li><strong>콘텐츠 이해도 증대</strong>: 중요한 포인트를 강조할 수 있어 시청자들이 내용을 쉽게 이해할 수 있습니다.</li>
             </ul>
-            <p>초기에 서비스의 성능을 평가하고 피드백을 얻기 위해 [크리에이터 이름]님께 서비스를 무료로 이용해볼 수 있는 기회를 드리고자 합니다.
+            <p>초기에 서비스의 성능을 평가하고 피드백을 얻기 위해 ${youtubeName}님께 서비스를 무료로 이용해볼 수 있는 기회를 드리고자 합니다.
             아래의 쿠폰코드를 사용하시면 포인트가 충전되며, 이를 통해 서비스를 체험해보실 수 있습니다.</p>
             <div class="coupon">
-                <p><strong>쿠폰 코드: FREECHAPTERS</strong></p>
-                <p>포인트 충전: 100포인트</p>
+                <p><strong>쿠폰 코드: ${couponCode}</strong></p>
+                <p>포인트 충전: 400포인트</p>
             </div>
             <div class="button-container">
-                <a href="https://your-service-url.com" class="button">서비스 체험하기</a>
+                <a href="${url}" class="button">서비스 체험하기</a>
             </div>
         </div>
         <div class="footer">
-            <p>감사합니다, [귀하의 이름] 드림</p>
+            <p>감사합니다, 머그스페이스 드림</p>
         </div>
     </div>
 </body>

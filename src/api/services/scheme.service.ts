@@ -113,7 +113,7 @@ export class SchemeService {
 			if (dayjs(scheme.expiredAt).isBefore()) {
 				scheme.expiredAt = dayjs().add(addMonth, 'months').valueOf()
 			} else {
-				scheme.expiredAt = dayjs(scheme.expiredAt).add(addMonth).valueOf()
+				scheme.expiredAt = dayjs(scheme.expiredAt).add(addMonth, 'months').valueOf()
 			}
 			await this.schemeRepository.save(scheme)
 			return this.definedSchemeModel(scheme)

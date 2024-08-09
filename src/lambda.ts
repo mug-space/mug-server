@@ -1,7 +1,7 @@
 import { APIGatewayEvent, Context } from 'aws-lambda'
 import 'reflect-metadata'
 import ServerlessHttp from 'serverless-http'
-import { initApp } from './App'
+import { initApp } from './app'
 
 let _handler: ServerlessHttp.Handler
 const server = async () => {
