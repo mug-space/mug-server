@@ -77,10 +77,10 @@ export class SchemeService {
 		} catch (error) {
 			console.error(error)
 		}
-
-		const expiredAt = expireType === SchemeExpireType.ONE_MONTH ? dayjs().add(1, 'months') : dayjs().add(6, 'months')
+		const month = this.getMonth(expireType)
+		const expiredAt = dayjs().add(month, 'months').valueOf()
 		const scheme = this.schemeRepository.create({
-			path, url, userId, type, expireType, expiredAt: expiredAt.valueOf(), og,
+			path, url, userId, type, expireType, expiredAt, og,
 		})
 		await this.schemeRepository.save(scheme)
 		return this.definedSchemeModel(scheme)
@@ -106,19 +106,22 @@ export class SchemeService {
 	}
 
 	async updateSchemeExpiredAt(id: number, expireType: SchemeExpireType) {
-		const addMonth = expireType === SchemeExpireType.ONE_MONTH ? 1 : 6
-		const scheme = await this.schemeRepository.findOne({ where: {
-			id,
-		} })
-		if (scheme) {
-			if (dayjs(scheme.expiredAt).isBefore()) {
-				scheme.expiredAt = dayjs().add(addMonth, 'months').valueOf()
-			} else {
-				scheme.expiredAt = dayjs(scheme.expiredAt).add(addMonth, 'months').valueOf()
+		const addMonth = this.getMonth(expireType)
+		if (addMonth !== 0) {
+			const scheme = await this.schemeRepository.findOne({ where: {
+				id,
+			} })
+			if (scheme) {
+				if (dayjs(scheme.expiredAt).isBefore()) {
+					scheme.expiredAt = dayjs().add(addMonth, 'months').valueOf()
+				} else {
+					scheme.expiredAt = dayjs(scheme.expiredAt).add(addMonth, 'months').valueOf()
+				}
+				await this.schemeRepository.save(scheme)
+				return this.definedSchemeModel(scheme)
 			}
-			await this.schemeRepository.save(scheme)
-			return this.definedSchemeModel(scheme)
 		}
+
 		return null
 	}
 
@@ -205,7 +208,21 @@ export class SchemeService {
 			return SchemeType.FACEBOOK_POST
 		}
 		return null
+	}
 
+	private getMonth(expireType: SchemeExpireType) {
+		switch (expireType) {
+			case SchemeExpireType.ONE_MONTH:
+				return 1
+			case SchemeExpireType.THREE_MONTH:
+				return 3
+			case SchemeExpireType.SIX_MONTH:
+				return 6
+			case SchemeExpireType.TWELVE_MONTH:
+				return 12
+			default:
+				return 0
+		}
 	}
 
 	validPath(path: string) {
